@@ -9,24 +9,58 @@ interface Node {
 // cat/car/card share the "ca"/"car" prefix; "do" is itself a complete word
 // AND a prefix of "dog", demonstrating a node that's both an end-of-word and
 // has further children.
-const INSERT_WORDS = ['cat', 'car', 'card', 'dog', 'do']
-const SEARCH_HIT = 'car'
-const SEARCH_MISS_PREFIX_ONLY = 'ca' // real path, but never marked end-of-word
-const SEARCH_MISS_NO_PATH = 'cow' // path itself doesn't exist
+export const DEFAULT_WORDS = ['cat', 'car', 'card', 'dog', 'do']
 
-export function* trie(): Generator<TrieStep> {
+export function* trie(words: string[] = DEFAULT_WORDS): Generator<TrieStep> {
   const root: Node = { char: '', isEnd: false, children: new Map() }
   yield { type: 'start', snapshot: null }
 
-  for (const word of INSERT_WORDS) {
+  for (const word of words) {
     yield* insertWord(root, word)
   }
 
-  yield* search(root, SEARCH_HIT)
-  yield* search(root, SEARCH_MISS_PREFIX_ONLY)
-  yield* search(root, SEARCH_MISS_NO_PATH)
+  if (words.length > 0) {
+    const longest = [...words].sort((a, b) => b.length - a.length)[0]
+
+    yield* search(root, longest)
+
+    const prefixMiss = findPrefixMiss(root, longest)
+    if (prefixMiss) yield* search(root, prefixMiss)
+
+    yield* search(root, findNoPathMiss(root, longest))
+  }
 
   yield { type: 'done', snapshot: cloneNode(root) }
+}
+
+// Walks the already-built trie along `longest`'s own prefixes and returns
+// the shortest one that was never marked end-of-word - a real path that is
+// still a legitimate "not a word" miss. Returns null only if every proper
+// prefix of `longest` also happens to be a separately inserted word.
+function findPrefixMiss(root: Node, longest: string): string | null {
+  let node = root
+  let path = ''
+  for (let i = 0; i < longest.length - 1; i++) {
+    node = node.children.get(longest[i])!
+    path += longest[i]
+    if (!node.isEnd) return path
+  }
+  return null
+}
+
+// Walks to the end of `longest` in the built trie, then finds a letter that
+// isn't one of that node's children - guaranteeing a genuine "no path" miss
+// regardless of what words were inserted.
+function findNoPathMiss(root: Node, longest: string): string {
+  let node = root
+  for (const ch of longest) {
+    node = node.children.get(ch)!
+  }
+  for (let code = 97; code <= 122; code++) {
+    const ch = String.fromCharCode(code)
+    if (!node.children.has(ch)) return longest + ch
+  }
+  return longest + 'zzz'
 }
 
 function* insertWord(root: Node, word: string): Generator<TrieStep> {

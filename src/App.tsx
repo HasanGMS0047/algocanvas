@@ -16,6 +16,7 @@ import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
 import { AppHeader } from './components/AppHeader'
 import { ArrayInput } from './components/ArrayInput'
 import { Visualizer } from './components/Visualizer'
+import { WordListInput } from './components/WordListInput'
 import { avlPredictor } from './predict/avlPredictor'
 import { quickSortPredictor } from './predict/quickSortPredictor'
 import { renderArrayFrame } from './render/renderArray'
@@ -27,6 +28,7 @@ import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
 import { useAlgorithmKind } from './useAlgorithmKind'
 import { validateArray } from './validateArray'
+import { validateWords } from './validateWords'
 
 const DEFAULT_ARRAY = [8, 3, 9, 1, 6, 4, 7, 2, 5, 10]
 const TREE_SEQUENCE_MAX_LENGTH = 12
@@ -40,11 +42,14 @@ const ALL_ALGORITHMS = [
   ...HASHTABLE_ALGORITHMS,
 ]
 const SORT_AND_DIST_IDS = new Set([...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS].map((a) => a.id))
+const TRIE_IDS = new Set(TRIE_ALGORITHMS.map((a) => a.id))
+const DEFAULT_TRIE_WORDS = TRIE_ALGORITHMS[0].defaultWords
 
 function App() {
   const [algorithmId, setAlgorithmId] = useState(ALL_ALGORITHMS[0].id)
   const [customArray, setCustomArray] = useState<number[]>(DEFAULT_ARRAY)
   const [customTreeSequence, setCustomTreeSequence] = useState<number[] | null>(null)
+  const [customWords, setCustomWords] = useState<string[]>(DEFAULT_TRIE_WORDS)
 
   const validation = useMemo(() => validateArray(customArray, algorithmId), [customArray, algorithmId])
   const effectiveArray = validation.valid ? customArray : DEFAULT_ARRAY
@@ -103,7 +108,16 @@ function App() {
     renderBTreeFrame,
     [effectiveTreeSequence],
   )
-  const trie = useAlgorithmKind(algorithmId, TRIE_ALGORITHMS, (a) => recordTrieFrames(a.run), renderTrieFrame)
+  const wordsValidation = useMemo(() => validateWords(customWords), [customWords])
+  const effectiveWords = wordsValidation.valid ? customWords : DEFAULT_TRIE_WORDS
+
+  const trie = useAlgorithmKind(
+    algorithmId,
+    TRIE_ALGORITHMS,
+    (a) => recordTrieFrames(() => a.run(effectiveWords)),
+    renderTrieFrame,
+    [effectiveWords],
+  )
   const hashTable = useAlgorithmKind(
     algorithmId,
     HASHTABLE_ALGORITHMS,
@@ -126,6 +140,9 @@ function App() {
           randomLengthRange={[6, 9]}
           randomValueMax={50}
         />
+      )}
+      {TRIE_IDS.has(algorithmId) && (
+        <WordListInput value={customWords} onChange={setCustomWords} error={wordsValidation.error} />
       )}
       {sort && (
         <Visualizer

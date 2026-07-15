@@ -36,10 +36,10 @@ describe('trie', () => {
     expect(o.children.map((n) => n.char)).toEqual(['g']) // and a prefix of "dog"
   })
 
-  it('search finds an inserted word', () => {
+  it('search finds an inserted word (the longest inserted word)', () => {
     const frames = recordTrieFrames(trie)
     const foundSteps = frames.map((f) => f.step).filter((s) => s.type === 'found')
-    expect(foundSteps).toEqual([{ type: 'found', word: 'car', snapshot: expect.anything() }])
+    expect(foundSteps).toEqual([{ type: 'found', word: 'card', snapshot: expect.anything() }])
   })
 
   it('search distinguishes "no path" from "valid prefix but not a word"', () => {
@@ -50,8 +50,35 @@ describe('trie', () => {
       .map((s) => (s.type === 'notFound' ? { word: s.word, reason: s.reason } : null))
 
     expect(notFoundSteps).toEqual([
-      { word: 'ca', reason: 'not-a-word' },
-      { word: 'cow', reason: 'no-path' },
+      { word: 'c', reason: 'not-a-word' },
+      { word: 'carda', reason: 'no-path' },
     ])
+  })
+
+  it('derives search targets from a custom word list', () => {
+    const frames = recordTrieFrames(() => trie(['dog', 'cat', 'coder', 'code', 'do']))
+    const finalWords = collectWords(frames[frames.length - 1].root).sort()
+    expect(finalWords).toEqual(['cat', 'code', 'coder', 'do', 'dog'])
+
+    const found = frames.map((f) => f.step).filter((s) => s.type === 'found')
+    expect(found).toEqual([{ type: 'found', word: 'coder', snapshot: expect.anything() }])
+
+    const notFound = frames
+      .map((f) => f.step)
+      .filter((s) => s.type === 'notFound')
+      .map((s) => (s.type === 'notFound' ? { word: s.word, reason: s.reason } : null))
+    expect(notFound).toEqual([
+      { word: 'c', reason: 'not-a-word' },
+      { word: 'codera', reason: 'no-path' },
+    ])
+  })
+
+  it('handles a single-word list without crashing', () => {
+    const frames = recordTrieFrames(() => trie(['hi']))
+    const finalWords = collectWords(frames[frames.length - 1].root)
+    expect(finalWords).toEqual(['hi'])
+
+    const found = frames.map((f) => f.step).filter((s) => s.type === 'found')
+    expect(found).toEqual([{ type: 'found', word: 'hi', snapshot: expect.anything() }])
   })
 })
