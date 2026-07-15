@@ -1,21 +1,22 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
+import { bubbleSort } from './algorithms/bubbleSort'
+import { recordFrames } from './algorithms/recordFrames'
 import { AlgoCanvas } from './components/AlgoCanvas'
 import { PlayerControls } from './components/PlayerControls'
-import { fakeFrames } from './player/fakeFrames'
 import { usePlayer } from './player/usePlayer'
+import { renderArrayFrame } from './render/renderArray'
+
+const DEMO_ARRAY = [8, 3, 9, 1, 6, 4, 7, 2, 5, 10]
 
 function App() {
-  const player = usePlayer({ frameCount: fakeFrames.length, msPerFrame: 800 })
+  const frames = useMemo(() => recordFrames(DEMO_ARRAY, bubbleSort), [])
+  const player = usePlayer({ frameCount: frames.length, msPerFrame: 500 })
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-      ctx.fillStyle = '#888'
-      ctx.font = '24px system-ui, sans-serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText(fakeFrames[player.index], width / 2, height / 2)
+      renderArrayFrame(ctx, width, height, frames[player.index])
     },
-    [player.index],
+    [frames, player.index],
   )
 
   return (
@@ -23,7 +24,7 @@ function App() {
       <AlgoCanvas draw={draw} />
       <PlayerControls
         index={player.index}
-        frameCount={fakeFrames.length}
+        frameCount={frames.length}
         isPlaying={player.isPlaying}
         speed={player.speed}
         onPlay={player.play}
