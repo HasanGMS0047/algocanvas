@@ -3,9 +3,11 @@ import { PALETTE } from './palette'
 
 const PADDING = 24
 const GAP = 4
+const LABEL_HEIGHT = 16
 
 interface RenderArrayOptions {
   treeOverlay?: boolean
+  showValues?: boolean
 }
 
 export function renderArrayFrame(
@@ -24,10 +26,11 @@ export function renderArrayFrame(
   const n = array.length
   const barWidth = (width - PADDING * 2 - GAP * (n - 1)) / n
   const max = Math.max(...array)
-  const usableHeight = height - PADDING * 2 - 32
+  const barBottom = height - PADDING - (options.showValues ? LABEL_HEIGHT : 0)
+  const usableHeight = barBottom - PADDING - 32
 
   const centerX = (i: number) => PADDING + i * (barWidth + GAP) + barWidth / 2
-  const topY = (i: number) => height - PADDING - (array[i] / max) * usableHeight
+  const topY = (i: number) => barBottom - (array[i] / max) * usableHeight
 
   if (options.treeOverlay) {
     ctx.strokeStyle = PALETTE.edge
@@ -44,10 +47,18 @@ export function renderArrayFrame(
     const value = array[i]
     const barHeight = (value / max) * usableHeight
     const x = PADDING + i * (barWidth + GAP)
-    const y = height - PADDING - barHeight
+    const y = barBottom - barHeight
 
     ctx.fillStyle = highlighted.includes(i) ? highlightColor : PALETTE.default
     ctx.fillRect(x, y, barWidth, barHeight)
+
+    if (options.showValues) {
+      ctx.fillStyle = PALETTE.text
+      ctx.font = "11px 'Inter', system-ui, sans-serif"
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'top'
+      ctx.fillText(String(value), x + barWidth / 2, barBottom + 2)
+    }
   }
 
   ctx.fillStyle = PALETTE.textMuted

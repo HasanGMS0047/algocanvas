@@ -24,6 +24,7 @@ import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
 import { AppHeader } from './components/AppHeader'
 import { ArrayInput } from './components/ArrayInput'
 import { GraphInput } from './components/GraphInput'
+import { ShowValuesToggle } from './components/ShowValuesToggle'
 import { TargetInput } from './components/TargetInput'
 import { TreeShapeInput } from './components/TreeShapeInput'
 import { Visualizer } from './components/Visualizer'
@@ -120,6 +121,7 @@ function App() {
   const [customStartNode, setCustomStartNode] = useState<string | null>(null)
   const [customTarget, setCustomTarget] = useState<number | null>(null)
   const [customTreeShapeText, setCustomTreeShapeText] = useState<string | null>(null)
+  const [showValues, setShowValues] = useState(true)
 
   const validation = useMemo(() => validateArray(customArray, algorithmId), [customArray, algorithmId])
   const effectiveArray = validation.valid ? customArray : DEFAULT_ARRAY
@@ -150,7 +152,7 @@ function App() {
     algorithmId,
     SORT_ALGORITHMS,
     (a) => recordFrames(effectiveArray, a.run),
-    (ctx, w, h, frame, a) => renderArrayFrame(ctx, w, h, frame, { treeOverlay: a.treeOverlay }),
+    (ctx, w, h, frame, a) => renderArrayFrame(ctx, w, h, frame, { treeOverlay: a.treeOverlay, showValues }),
     [effectiveArray],
   )
   const dist = useAlgorithmKind(
@@ -160,7 +162,7 @@ function App() {
       const bucketCount = a.id === 'counting' ? Math.max(...effectiveArray) + 1 : a.bucketCount
       return recordDistributionFrames(effectiveArray, bucketCount, a.run)
     },
-    renderBucketFrame,
+    (ctx, w, h, frame) => renderBucketFrame(ctx, w, h, frame, { showValues }),
     [effectiveArray],
   )
   const searchAlgorithm = SEARCH_ALGORITHMS.find((a) => a.id === algorithmId)
@@ -174,7 +176,7 @@ function App() {
     algorithmId,
     SEARCH_ALGORITHMS,
     (a) => recordSearchFrames(searchArray, effectiveTarget, a.run),
-    renderSearchFrame,
+    (ctx, w, h, frame) => renderSearchFrame(ctx, w, h, frame, { showValues }),
     [searchArray, effectiveTarget],
   )
 
@@ -182,7 +184,7 @@ function App() {
     algorithmId,
     DP_ALGORITHMS,
     (a) => recordLisFrames(effectiveArray, a.run),
-    renderLisFrame,
+    (ctx, w, h, frame) => renderLisFrame(ctx, w, h, frame, { showValues }),
     [effectiveArray],
   )
 
@@ -263,6 +265,9 @@ function App() {
       />
       {NUMBER_ARRAY_IDS.has(algorithmId) && (
         <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />
+      )}
+      {NUMBER_ARRAY_IDS.has(algorithmId) && (
+        <ShowValuesToggle enabled={showValues} onChange={setShowValues} />
       )}
       {SEARCH_IDS.has(algorithmId) && <TargetInput value={effectiveTarget} onChange={setCustomTarget} />}
       {BINARY_TREE_IDS.has(algorithmId) && (
