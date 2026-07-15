@@ -1,5 +1,4 @@
 import { setPaletteColors } from '../render/palette'
-import { hexToRgba } from './colorUtils'
 import { DEFAULT_THEME_ID, THEME_PRESETS, type ThemeColors } from './themes'
 
 const STORAGE_KEY = 'algocanvas-theme-v2'
@@ -52,22 +51,6 @@ export function applyThemeState(state: ThemeState) {
   root.setProperty('--color-accent-green', colors.accentGreen)
   root.setProperty('--color-accent-orange', colors.accentOrange)
   root.setProperty('--color-danger', colors.danger)
-
-  // Light mode gets a subtle ring only - a big soft-glow blur reads as
-  // muddy on a white background, and the vivid gradient wash under dark
-  // themes would look like dirt on a light one.
-  root.setProperty(
-    '--focus-glow',
-    mode === 'light'
-      ? `0 0 0 3px ${hexToRgba(colors.accentBlue, 0.18)}`
-      : `0 0 0 3px ${hexToRgba(colors.accentBlue, 0.28)}, 0 0 16px ${hexToRgba(colors.accentBlue, 0.3)}`,
-  )
-  root.setProperty(
-    '--bg-glow',
-    mode === 'light'
-      ? 'none'
-      : `radial-gradient(circle at 15% -10%, ${hexToRgba(colors.accentPurple, 0.1)}, transparent 45%), radial-gradient(circle at 85% 0%, ${hexToRgba(colors.accentBlue, 0.08)}, transparent 40%)`,
-  )
 
   document.documentElement.style.colorScheme = mode
   document.documentElement.dataset.themeMode = mode

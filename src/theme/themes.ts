@@ -113,24 +113,6 @@ export const THEME_PRESETS: ThemeDefinition[] = [
       danger: '#ef4444',
     },
   },
-  {
-    id: 'neon',
-    name: 'Neon',
-    mode: 'dark',
-    colors: {
-      bg: '#0a0a0f',
-      bgSecondary: '#101018',
-      panel: '#15151f',
-      border: '#26263a',
-      text: '#eafeff',
-      textMuted: '#7a8699',
-      accentBlue: '#00e5ff',
-      accentPurple: '#b06bff',
-      accentGreen: '#9dff45',
-      accentOrange: '#ff2ec4',
-      danger: '#ff3b5c',
-    },
-  },
 ]
 
 export const DEFAULT_THEME_ID = 'dark'

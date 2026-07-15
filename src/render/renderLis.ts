@@ -1,9 +1,11 @@
 import type { LisFrame } from '../algorithms/dp/recordLisFrames'
+import { drawBarIndex, drawBarValue } from './barLabels'
 import { PALETTE } from './palette'
 
 const PADDING = 24
 const GAP = 4
-const LABEL_HEIGHT = 18
+const DP_LABEL_HEIGHT = 16
+const INDEX_LABEL_HEIGHT = 16
 
 interface RenderLisOptions {
   showValues?: boolean
@@ -20,7 +22,11 @@ export function renderLisFrame(
   const n = array.length
   const barWidth = (width - PADDING * 2 - GAP * (n - 1)) / n
   const max = Math.max(...array, 1)
-  const barBottom = height - PADDING - LABEL_HEIGHT
+  // dp is always shown (it's the algorithm's core state, not a convenience
+  // label), so its row is always reserved; the index row only appears
+  // alongside showValues, stacked above the dp row.
+  const indexRowHeight = options.showValues ? INDEX_LABEL_HEIGHT : 0
+  const barBottom = height - PADDING - DP_LABEL_HEIGHT - indexRowHeight
   const usableHeight = barBottom - PADDING - 32
 
   const compareIndices = step.type === 'compare' ? [step.i, step.j] : []
@@ -32,6 +38,7 @@ export function renderLisFrame(
     const barHeight = (value / max) * usableHeight
     const x = PADDING + i * (barWidth + GAP)
     const y = barBottom - barHeight
+    const centerX = x + barWidth / 2
 
     ctx.fillStyle = lisSet.has(i)
       ? PALETTE.found
@@ -43,18 +50,15 @@ export function renderLisFrame(
     ctx.fillRect(x, y, barWidth, barHeight)
 
     if (options.showValues) {
-      ctx.fillStyle = PALETTE.text
-      ctx.font = "11px 'Inter', system-ui, sans-serif"
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'bottom'
-      ctx.fillText(String(value), x + barWidth / 2, y - 2)
+      drawBarValue(ctx, centerX, y, barHeight, value)
+      drawBarIndex(ctx, centerX, barBottom, i)
     }
 
     ctx.fillStyle = PALETTE.textMuted
     ctx.font = "11px 'Inter', system-ui, sans-serif"
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
-    ctx.fillText(`dp=${dp[i]}`, x + barWidth / 2, barBottom + 2)
+    ctx.fillText(`dp=${dp[i]}`, centerX, barBottom + indexRowHeight + 2)
   }
 
   ctx.fillStyle = PALETTE.textMuted

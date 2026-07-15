@@ -19,12 +19,6 @@
   --color-accent-green: #32d583;
   --color-accent-orange: #f79009;
   --color-danger: #f04438;
-
-  --focus-glow:
-    0 0 0 3px rgba(79, 139, 255, 0.28),
-    0 0 16px rgba(79, 139, 255, 0.3);
-  --bg-glow: radial-gradient(circle at 15% -10%, rgba(124, 92, 252, 0.1), transparent 45%),
-    radial-gradient(circle at 85% 0%, rgba(79, 139, 255, 0.08), transparent 40%);
 }
 
 /* A hard height (not min-height) is what lets the canvas's flex-shrink
@@ -43,7 +37,7 @@ body,
 body {
   font: 16px/1.5 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   overflow: hidden;
-  background: var(--bg-glow), var(--color-bg);
+  background: var(--color-bg);
   color: var(--color-text);
   transition:
     background-color 250ms ease,
