@@ -1,7 +1,7 @@
 import { bfs } from './bfs'
 import { dfs } from './dfs'
 import { dijkstra } from './dijkstra'
-import type { GraphStep } from './types'
+import type { GraphSpec, GraphStep } from './types'
 
 const CATEGORY = 'Graphs'
 
@@ -9,7 +9,7 @@ export interface GraphAlgorithm {
   id: string
   name: string
   category: string
-  run: () => Generator<GraphStep>
+  run: (graph?: GraphSpec, start?: string) => Generator<GraphStep>
 }
 
 export const GRAPH_ALGORITHMS: GraphAlgorithm[] = [

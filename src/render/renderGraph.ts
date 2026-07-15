@@ -1,5 +1,4 @@
-import { DEMO_GRAPH } from '../algorithms/graph/demoGraph'
-import type { GraphFrame, GraphStep } from '../algorithms/graph/types'
+import type { GraphFrame, GraphSpec, GraphStep } from '../algorithms/graph/types'
 import { PALETTE } from './palette'
 
 const RADIUS = 20
@@ -7,7 +6,13 @@ const SIDE_MARGIN = 50
 const TOP_MARGIN = 70
 const BOTTOM_MARGIN = 30
 
-export function renderGraphFrame(ctx: CanvasRenderingContext2D, width: number, height: number, frame: GraphFrame) {
+export function renderGraphFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  frame: GraphFrame,
+  graph: GraphSpec,
+) {
   ctx.fillStyle = PALETTE.textMuted
   ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
@@ -21,9 +26,9 @@ export function renderGraphFrame(ctx: CanvasRenderingContext2D, width: number, h
   const activeNode = frame.step.type === 'visit' || frame.step.type === 'relax' ? frame.step.nodeId : null
   const visited = new Set(frame.visited)
 
-  for (const edge of DEMO_GRAPH.edges) {
-    const from = DEMO_GRAPH.nodes.find((n) => n.id === edge.from)!
-    const to = DEMO_GRAPH.nodes.find((n) => n.id === edge.to)!
+  for (const edge of graph.edges) {
+    const from = graph.nodes.find((n) => n.id === edge.from)!
+    const to = graph.nodes.find((n) => n.id === edge.to)!
     const isActive =
       activeEdge !== null &&
       ((activeEdge.from === edge.from && activeEdge.to === edge.to) ||
@@ -45,7 +50,7 @@ export function renderGraphFrame(ctx: CanvasRenderingContext2D, width: number, h
     }
   }
 
-  for (const node of DEMO_GRAPH.nodes) {
+  for (const node of graph.nodes) {
     const x = px(node.x)
     const y = py(node.y)
     const isActive = node.id === activeNode
