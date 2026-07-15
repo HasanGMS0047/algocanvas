@@ -8,17 +8,26 @@
   padding: 18px 24px;
   background: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 24px -8px var(--color-accent-blue);
+}
+
+.app-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .app-brand h1 {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
   letter-spacing: -0.02em;
   background: linear-gradient(90deg, var(--color-accent-blue), var(--color-accent-purple));
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.35));
 }
 
 .app-brand p {
