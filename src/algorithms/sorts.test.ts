@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { bubbleSort } from './bubbleSort'
-import { heapSort } from './heapSort'
 import { insertionSort } from './insertionSort'
 import { mergeSort } from './mergeSort'
 import { quickSort } from './quickSort'
@@ -8,13 +7,14 @@ import { recordFrames } from './recordFrames'
 import { selectionSort } from './selectionSort'
 import type { SortStep } from './types'
 
+// Heap Sort has its own test file (algorithms/heap/heapSort.test.ts) - it no
+// longer shares this SortStep/recordFrames shape.
 const ALGORITHMS: Array<{ name: string; run: (arr: number[]) => Generator<SortStep> }> = [
   { name: 'bubbleSort', run: bubbleSort },
   { name: 'selectionSort', run: selectionSort },
   { name: 'insertionSort', run: insertionSort },
   { name: 'quickSort', run: quickSort },
   { name: 'mergeSort', run: mergeSort },
-  { name: 'heapSort', run: heapSort },
 ]
 
 const CASES: Array<{ name: string; input: number[] }> = [

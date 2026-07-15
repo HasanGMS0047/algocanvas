@@ -12,6 +12,8 @@ import { parseGraphText } from './algorithms/graph/parseGraphText'
 import { recordGraphFrames } from './algorithms/graph/recordGraphFrames'
 import { graphToText } from './algorithms/graph/utils'
 import { HASHTABLE_ALGORITHMS } from './algorithms/hashtable'
+import { HEAP_ALGORITHMS } from './algorithms/heap'
+import { recordHeapFrames } from './algorithms/heap/recordHeapFrames'
 import { recordHashTableFrames } from './algorithms/hashtable/recordHashTableFrames'
 import { recordFrames } from './algorithms/recordFrames'
 import { SEARCH_ALGORITHMS } from './algorithms/search'
@@ -33,6 +35,7 @@ import { explainBTreeStep } from './explain/btreeExplainer'
 import { explainDistributionStep } from './explain/distributionExplainer'
 import { explainGraphStep } from './explain/graphExplainer'
 import { explainHashTableStep } from './explain/hashTableExplainer'
+import { explainHeapStep } from './explain/heapExplainer'
 import { explainLisStep } from './explain/lisExplainer'
 import { explainSearchStep } from './explain/searchExplainer'
 import { explainSortStep } from './explain/sortExplainer'
@@ -45,6 +48,7 @@ import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
 import { renderGraphFrame } from './render/renderGraph'
 import { renderHashTableFrame } from './render/renderHashTable'
+import { renderHeapFrame } from './render/renderHeap'
 import { renderLisFrame } from './render/renderLis'
 import { renderSearchFrame } from './render/renderSearch'
 import { renderTreeFrame } from './render/renderTree'
@@ -68,11 +72,19 @@ const ALL_ALGORITHMS = [
   ...TRIE_ALGORITHMS,
   ...HASHTABLE_ALGORITHMS,
   ...DP_ALGORITHMS,
+  ...HEAP_ALGORITHMS,
 ]
-// Sorts, distribution sorts, searches, and this DP problem all edit the
-// same "array of numbers" shape, so they share one ArrayInput row instead
-// of each getting its own duplicate editor.
+// Sorts, distribution sorts, searches, this DP problem, and heap sort all
+// edit the same "array of numbers" shape, so they share one ArrayInput row
+// instead of each getting its own duplicate editor.
 const NUMBER_ARRAY_IDS = new Set(
+  [...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS, ...SEARCH_ALGORITHMS, ...DP_ALGORITHMS, ...HEAP_ALGORITHMS].map(
+    (a) => a.id,
+  ),
+)
+// Heap sort's tree/strip renderer always labels its values inline, so it has
+// no use for the bars-only "show values" toggle.
+const SHOW_VALUES_TOGGLE_IDS = new Set(
   [...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS, ...SEARCH_ALGORITHMS, ...DP_ALGORITHMS].map((a) => a.id),
 )
 const SEARCH_IDS = new Set(SEARCH_ALGORITHMS.map((a) => a.id))
@@ -152,7 +164,14 @@ function App() {
     algorithmId,
     SORT_ALGORITHMS,
     (a) => recordFrames(effectiveArray, a.run),
-    (ctx, w, h, frame, a) => renderArrayFrame(ctx, w, h, frame, { treeOverlay: a.treeOverlay, showValues }),
+    (ctx, w, h, frame) => renderArrayFrame(ctx, w, h, frame, { showValues }),
+    [effectiveArray],
+  )
+  const heap = useAlgorithmKind(
+    algorithmId,
+    HEAP_ALGORITHMS,
+    (a) => recordHeapFrames(effectiveArray, a.run),
+    (ctx, w, h, frame) => renderHeapFrame(ctx, w, h, frame),
     [effectiveArray],
   )
   const dist = useAlgorithmKind(
@@ -275,7 +294,7 @@ function App() {
       {NUMBER_ARRAY_IDS.has(algorithmId) && (
         <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />
       )}
-      {NUMBER_ARRAY_IDS.has(algorithmId) && (
+      {SHOW_VALUES_TOGGLE_IDS.has(algorithmId) && (
         <ShowValuesToggle enabled={showValues} onChange={setShowValues} />
       )}
       {SEARCH_IDS.has(algorithmId) && <TargetInput value={effectiveTarget} onChange={setCustomTarget} />}
@@ -317,6 +336,15 @@ function App() {
           render={sort.render}
           predictor={algorithmId === 'quick' ? quickSortPredictor : undefined}
           explainer={explainSortStep}
+          algorithmId={algorithmId}
+        />
+      )}
+      {heap && (
+        <Visualizer
+          key={algorithmId}
+          frames={heap.frames}
+          render={heap.render}
+          explainer={explainHeapStep}
           algorithmId={algorithmId}
         />
       )}

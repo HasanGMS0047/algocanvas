@@ -25,8 +25,6 @@ export function explainSortStep(frame: Frame, algorithmId: string): string {
         return `Comparing ${va} against the pivot ${vb} to decide which side of the partition it belongs on.`
       case 'merge':
         return `Comparing the next candidates from the two sorted halves (${va} vs ${vb}) to see which one gets written next.`
-      case 'heap':
-        return `Comparing a parent and child in the heap (${va} vs ${vb}) to check whether the heap property still holds.`
       default:
         return `Comparing the values at positions ${a} and ${b}.`
     }
@@ -43,8 +41,6 @@ export function explainSortStep(frame: Frame, algorithmId: string): string {
         return `Shifting the larger value one position to the right to make room for the value being inserted.`
       case 'quick':
         return `Swapping positions ${a} and ${b} to keep everything smaller than the pivot on the left side of the partition.`
-      case 'heap':
-        return `Swapping positions ${a} and ${b} - either moving the current maximum into its final sorted position, or continuing to sift a value down to restore the heap property.`
       default:
         return `Swapping the values at positions ${a} and ${b}.`
     }

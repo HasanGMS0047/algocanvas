@@ -11,6 +11,8 @@ import { bellmanFord } from '../algorithms/graph/bellmanFord'
 import { recordGraphFrames } from '../algorithms/graph/recordGraphFrames'
 import { HASHTABLE_ALGORITHMS } from '../algorithms/hashtable'
 import { recordHashTableFrames } from '../algorithms/hashtable/recordHashTableFrames'
+import { HEAP_ALGORITHMS } from '../algorithms/heap'
+import { recordHeapFrames } from '../algorithms/heap/recordHeapFrames'
 import { recordFrames } from '../algorithms/recordFrames'
 import { SEARCH_ALGORITHMS } from '../algorithms/search'
 import { recordSearchFrames } from '../algorithms/search/recordSearchFrames'
@@ -22,6 +24,7 @@ import { explainBTreeStep } from './btreeExplainer'
 import { explainDistributionStep } from './distributionExplainer'
 import { explainGraphStep } from './graphExplainer'
 import { explainHashTableStep } from './hashTableExplainer'
+import { explainHeapStep } from './heapExplainer'
 import { explainLisStep } from './lisExplainer'
 import { explainSearchStep } from './searchExplainer'
 import { explainSortStep } from './sortExplainer'
@@ -131,6 +134,15 @@ describe('explainers produce a non-empty sentence for every step of every real a
       const frames = recordLisFrames(DEMO_ARRAY, algo.run)
       for (const frame of frames) {
         expect(explainLisStep(frame, algo.id).length, `${algo.id} ${frame.step.type}`).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('heap', () => {
+    for (const algo of HEAP_ALGORITHMS) {
+      const frames = recordHeapFrames(DEMO_ARRAY, algo.run)
+      for (const frame of frames) {
+        expect(explainHeapStep(frame, algo.id).length, `${algo.id} ${frame.step.type}`).toBeGreaterThan(0)
       }
     }
   })
