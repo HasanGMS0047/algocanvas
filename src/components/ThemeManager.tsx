@@ -14,6 +14,7 @@ const COLOR_FIELDS: Array<{ key: keyof ThemeColors; label: string }> = [
   { key: 'bg', label: 'Background' },
   { key: 'panel', label: 'Panel' },
   { key: 'text', label: 'Text' },
+  { key: 'textMuted', label: 'Muted text' },
   { key: 'accentBlue', label: 'Accent 1' },
   { key: 'accentPurple', label: 'Accent 2' },
   { key: 'accentGreen', label: 'Success' },

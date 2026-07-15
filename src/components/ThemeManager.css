@@ -10,18 +10,20 @@
   padding: 8px 14px;
   background: var(--color-panel);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
+    border-color 100ms ease,
+    box-shadow 100ms ease,
+    transform 100ms ease;
 }
 
 .theme-manager-trigger:hover,
 .theme-manager-trigger[aria-expanded='true'] {
-  border-color: var(--color-accent-blue);
-  box-shadow: var(--focus-glow);
+  border-color: var(--color-text);
+  box-shadow: 4px 4px 0 0 var(--color-accent-blue);
+  transform: translate(-4px, -4px);
 }
 
 .theme-manager-swatch {
@@ -41,9 +43,9 @@
   max-width: 90vw;
   padding: 16px;
   background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-text);
   border-radius: var(--radius);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 6px 6px 0 0 var(--color-accent-blue);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -64,21 +66,24 @@
   padding: 8px 10px;
   background: var(--color-bg-secondary);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
+    border-color 100ms ease,
+    box-shadow 100ms ease,
+    transform 100ms ease;
 }
 
 .theme-preset-option:hover {
-  border-color: var(--color-accent-blue);
+  border-color: var(--color-text);
+  box-shadow: 3px 3px 0 0 var(--color-accent-blue);
+  transform: translate(-3px, -3px);
 }
 
 .theme-preset-option.active {
-  border-color: var(--color-accent-blue);
-  box-shadow: var(--focus-glow);
+  border-color: var(--color-text);
+  box-shadow: 3px 3px 0 0 var(--color-accent-blue);
 }
 
 .theme-preset-swatches {
@@ -120,7 +125,7 @@
 .theme-color-field input[type='color'] {
   width: 36px;
   height: 24px;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: 6px;
   background: none;
   cursor: pointer;
@@ -134,11 +139,11 @@
   padding: 6px 12px;
   background: var(--color-bg-secondary);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   width: 100%;
-  transition: border-color 150ms ease;
+  transition: border-color 100ms ease;
 }
 
 .theme-reset-button:hover {

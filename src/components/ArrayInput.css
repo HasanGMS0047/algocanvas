@@ -15,41 +15,43 @@
   font: inherit;
   color: var(--color-text);
   background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 6px 12px;
   transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
+    border-color 100ms ease,
+    box-shadow 100ms ease;
 }
 
 .array-input-field:focus {
   outline: none;
-  border-color: var(--color-accent-blue);
-  box-shadow: var(--focus-glow);
+  border-color: var(--color-text);
+  box-shadow: 4px 4px 0 0 var(--color-accent-blue);
 }
 
 .array-input button {
   font: inherit;
   color: var(--color-text);
   background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 6px 14px;
   cursor: pointer;
   transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease,
+    border-color 100ms ease,
+    box-shadow 100ms ease,
     transform 100ms ease;
 }
 
 .array-input button:hover {
-  border-color: var(--color-accent-blue);
-  box-shadow: var(--focus-glow);
+  border-color: var(--color-text);
+  box-shadow: 4px 4px 0 0 var(--color-accent-blue);
+  transform: translate(-4px, -4px);
 }
 
 .array-input button:active {
-  transform: scale(0.96);
+  box-shadow: 2px 2px 0 0 var(--color-accent-blue);
+  transform: translate(-2px, -2px);
 }
 
 .array-input-error {

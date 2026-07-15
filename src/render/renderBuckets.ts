@@ -1,4 +1,5 @@
 import type { DistributionFrame, DistributionStep } from '../algorithms/distribution/types'
+import { drawBarIndex, drawBarValue } from './barLabels'
 import { PALETTE } from './palette'
 
 const PADDING = 24
@@ -58,11 +59,8 @@ function drawArray(
     ctx.fillRect(x, y, barWidth, barHeight)
 
     if (showValues) {
-      ctx.fillStyle = PALETTE.text
-      ctx.font = "11px 'Inter', system-ui, sans-serif"
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'top'
-      ctx.fillText(String(value), x + barWidth / 2, barBottom + 2)
+      drawBarValue(ctx, x + barWidth / 2, y, barHeight, value)
+      drawBarIndex(ctx, x + barWidth / 2, barBottom, i)
     }
   }
 }
