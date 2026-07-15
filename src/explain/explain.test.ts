@@ -7,6 +7,7 @@ import { recordDistributionFrames } from '../algorithms/distribution/recordDistr
 import { DP_ALGORITHMS } from '../algorithms/dp'
 import { recordLisFrames } from '../algorithms/dp/recordLisFrames'
 import { GRAPH_ALGORITHMS } from '../algorithms/graph'
+import { bellmanFord } from '../algorithms/graph/bellmanFord'
 import { recordGraphFrames } from '../algorithms/graph/recordGraphFrames'
 import { HASHTABLE_ALGORITHMS } from '../algorithms/hashtable'
 import { recordHashTableFrames } from '../algorithms/hashtable/recordHashTableFrames'
@@ -73,6 +74,20 @@ describe('explainers produce a non-empty sentence for every step of every real a
         expect(explainGraphStep(frame, algo.id).length, `${algo.id} ${frame.step.type}`).toBeGreaterThan(0)
       }
     }
+  })
+
+  it('graphs: negative cycle (bellman-ford only)', () => {
+    const graph = {
+      nodes: [
+        { id: 'X', x: 0.2, y: 0.5 },
+        { id: 'Y', x: 0.8, y: 0.5 },
+      ],
+      edges: [{ from: 'X', to: 'Y', weight: -5 }],
+    }
+    const frames = recordGraphFrames(() => bellmanFord(graph, 'X'))
+    const negativeCycleFrame = frames.find((f) => f.step.type === 'negativeCycle')!
+    expect(negativeCycleFrame).toBeDefined()
+    expect(explainGraphStep(negativeCycleFrame, 'bellman-ford').length).toBeGreaterThan(0)
   })
 
   it('trees', () => {

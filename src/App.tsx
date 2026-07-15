@@ -186,9 +186,11 @@ function App() {
     [effectiveArray],
   )
 
+  const currentGraphAlgorithm = GRAPH_ALGORITHMS.find((a) => a.id === algorithmId)
+  const allowNegativeWeights = currentGraphAlgorithm?.allowsNegativeWeights ?? false
   const graphParse = useMemo(
-    () => (customGraphText !== null ? parseGraphText(customGraphText) : null),
-    [customGraphText],
+    () => (customGraphText !== null ? parseGraphText(customGraphText, { allowNegativeWeights }) : null),
+    [customGraphText, allowNegativeWeights],
   )
   const effectiveGraph = graphParse?.graph ?? DEMO_GRAPH
   const effectiveStart = useMemo(() => {
@@ -291,7 +293,7 @@ function App() {
           startNode={effectiveStart}
           onStartNodeChange={setCustomStartNode}
           nodeIds={effectiveGraph.nodes.map((n) => n.id)}
-          showStartNode={GRAPH_ALGORITHMS.find((a) => a.id === algorithmId)?.usesStart ?? true}
+          showStartNode={currentGraphAlgorithm?.usesStart ?? true}
         />
       )}
       {sort && (

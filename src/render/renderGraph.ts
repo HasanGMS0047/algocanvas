@@ -13,7 +13,7 @@ export function renderGraphFrame(
   frame: GraphFrame,
   graph: GraphSpec,
 ) {
-  ctx.fillStyle = PALETTE.textMuted
+  ctx.fillStyle = frame.hasNegativeCycle ? PALETTE.swap : PALETTE.textMuted
   ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
@@ -95,6 +95,8 @@ function describeStep(step: GraphStep): string {
       return `distance[${step.nodeId}] = ${step.distance}`
     case 'acceptEdge':
       return `add edge ${step.from}–${step.to} to MST`
+    case 'negativeCycle':
+      return '⚠ negative cycle detected - distances are unreliable'
     case 'done':
       return 'done'
   }

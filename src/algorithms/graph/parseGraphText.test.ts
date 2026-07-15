@@ -52,6 +52,16 @@ describe('parseGraphText', () => {
     expect(parseGraphText('A-B:-3').graph).toBeNull()
   })
 
+  it('rejects zero even when negative weights are allowed', () => {
+    expect(parseGraphText('A-B:0', { allowNegativeWeights: true }).graph).toBeNull()
+  })
+
+  it('allows a negative weight when explicitly opted in (Bellman-Ford)', () => {
+    const { graph, error } = parseGraphText('A-B:-3', { allowNegativeWeights: true })
+    expect(error).toBeUndefined()
+    expect(graph!.edges).toEqual([{ from: 'A', to: 'B', weight: -3 }])
+  })
+
   it('rejects more than 20 edges', () => {
     const lines = Array.from({ length: 21 }, (_, i) => `N${i}-N${i + 1}`)
     expect(parseGraphText(lines.join('\n')).graph).toBeNull()
