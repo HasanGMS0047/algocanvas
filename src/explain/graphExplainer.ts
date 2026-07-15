@@ -18,6 +18,8 @@ export function explainGraphStep(frame: GraphFrame, algorithmId: string): string
         return `Adding node ${step.nodeId} to the growing minimum spanning tree.`
       case 'kruskal':
         return `Node ${step.nodeId} just got connected into the spanning tree by an accepted edge.`
+      case 'bellman-ford':
+        return `${step.nodeId} was reached with a finite distance after all edges converged.`
       default:
         return `Visiting node ${step.nodeId}.`
     }
@@ -31,6 +33,8 @@ export function explainGraphStep(frame: GraphFrame, algorithmId: string): string
         return `Considering edge ${step.from}-${step.to} as a candidate to extend the tree - only the single cheapest candidate across the whole frontier gets accepted.`
       case 'kruskal':
         return `Considering edge ${step.from}-${step.to}, the next-cheapest edge remaining - it'll be accepted unless both endpoints are already connected (which would create a cycle).`
+      case 'bellman-ford':
+        return `Relaxing edge ${step.from}-${step.to} - unlike Dijkstra, every edge gets rechecked on every pass, which is what makes this work even with negative weights.`
       default:
         return `Exploring the edge between ${step.from} and ${step.to}.`
     }
@@ -42,6 +46,10 @@ export function explainGraphStep(frame: GraphFrame, algorithmId: string): string
 
   if (step.type === 'acceptEdge') {
     return `Adding edge ${step.from}-${step.to} to the minimum spanning tree.`
+  }
+
+  if (step.type === 'negativeCycle') {
+    return "Ran one extra pass over every edge and something still improved - that means a negative-weight cycle exists, so 'shortest path' is undefined (you could loop it forever to keep decreasing the total). The distances above are no longer reliable."
   }
 
   return ''

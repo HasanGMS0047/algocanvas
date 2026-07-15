@@ -23,6 +23,7 @@ export type GraphStep =
   | { type: 'visitEdge'; from: string; to: string }
   | { type: 'relax'; nodeId: string; distance: number }
   | { type: 'acceptEdge'; from: string; to: string }
+  | { type: 'negativeCycle' }
   | { type: 'done' }
 
 export interface GraphFrame {
@@ -30,4 +31,5 @@ export interface GraphFrame {
   visited: string[]
   distances: Record<string, number>
   mstEdges: Array<{ from: string; to: string }>
+  hasNegativeCycle: boolean
 }
