@@ -1,13 +1,8 @@
 import type { TrieFrame, TrieNodeSpec, TrieStep } from '../algorithms/trie/types'
+import { PALETTE } from './palette'
 
 const RADIUS = 16
 const ROOT_RADIUS = 8
-const COLOR_NODE = '#3b82f6'
-const COLOR_VISIT = '#f59e0b'
-const COLOR_CREATE = '#a855f7'
-const COLOR_END = '#10b981'
-const COLOR_NOT_FOUND = '#ef4444'
-const COLOR_EDGE = 'rgba(128, 128, 128, 0.5)'
 const LEVEL_GAP = 70
 const TOP_MARGIN = 56
 const SIDE_MARGIN = 32
@@ -22,8 +17,8 @@ interface PositionedNode {
 }
 
 export function renderTrieFrame(ctx: CanvasRenderingContext2D, width: number, _height: number, frame: TrieFrame) {
-  ctx.fillStyle = '#888'
-  ctx.font = '16px system-ui, sans-serif'
+  ctx.fillStyle = PALETTE.textMuted
+  ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText(describeStep(frame.step), width / 2, 4)
@@ -40,7 +35,7 @@ export function renderTrieFrame(ctx: CanvasRenderingContext2D, width: number, _h
 
   const highlight = getHighlight(frame.step)
 
-  ctx.strokeStyle = COLOR_EDGE
+  ctx.strokeStyle = PALETTE.edge
   ctx.lineWidth = 1.5
   drawEdges(ctx, positioned, px, py)
   drawNodes(ctx, positioned, px, py, highlight)
@@ -94,18 +89,18 @@ function drawNodes(
   const isRoot = node.path === ''
   const radius = isRoot ? ROOT_RADIUS : RADIUS
 
-  ctx.fillStyle = highlight && node.path === highlight.path ? highlight.color : COLOR_NODE
+  ctx.fillStyle = highlight && node.path === highlight.path ? highlight.color : PALETTE.default
   ctx.beginPath()
   ctx.arc(x, y, radius, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.lineWidth = node.isEnd ? 3 : 1
-  ctx.strokeStyle = node.isEnd ? '#111827' : '#fff'
+  ctx.strokeStyle = node.isEnd ? PALETTE.text : 'rgba(255, 255, 255, 0.3)'
   ctx.stroke()
 
   if (!isRoot) {
-    ctx.fillStyle = '#fff'
-    ctx.font = '13px system-ui, sans-serif'
+    ctx.fillStyle = PALETTE.text
+    ctx.font = "13px 'Inter', system-ui, sans-serif"
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(node.char, x, y + 1)
@@ -117,15 +112,15 @@ function drawNodes(
 function getHighlight(step: TrieStep): { path: string; color: string } | undefined {
   switch (step.type) {
     case 'visit':
-      return { path: step.path, color: COLOR_VISIT }
+      return { path: step.path, color: PALETTE.compare }
     case 'createNode':
-      return { path: step.path, color: COLOR_CREATE }
+      return { path: step.path, color: PALETTE.structural }
     case 'markEnd':
-      return { path: step.path, color: COLOR_END }
+      return { path: step.path, color: PALETTE.found }
     case 'found':
-      return { path: step.word, color: COLOR_END }
+      return { path: step.word, color: PALETTE.found }
     case 'notFound':
-      return step.reason === 'not-a-word' ? { path: step.word, color: COLOR_NOT_FOUND } : undefined
+      return step.reason === 'not-a-word' ? { path: step.word, color: PALETTE.swap } : undefined
     default:
       return undefined
   }

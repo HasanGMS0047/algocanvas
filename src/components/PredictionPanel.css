@@ -4,22 +4,27 @@
   align-items: center;
   gap: 6px;
   align-self: flex-start;
-  margin: 0 16px 16px;
+  margin: 0 20px 16px;
   font-size: 14px;
-  color: light-dark(#555, #aaa);
+  color: var(--color-text-muted);
   cursor: pointer;
+}
+
+.predict-toggle input {
+  accent-color: var(--color-accent-purple);
 }
 
 .prediction-panel {
   flex: 0 0 auto;
-  padding: 12px 16px;
-  background: light-dark(rgba(79, 139, 255, 0.08), rgba(79, 139, 255, 0.12));
-  border-top: 1px solid light-dark(#ddd, #333);
+  padding: 14px 20px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
 }
 
 .prediction-prompt {
   margin: 0 0 10px;
   font-weight: 500;
+  color: var(--color-text);
 }
 
 .prediction-options {
@@ -30,10 +35,11 @@
 
 .prediction-option {
   font: inherit;
+  color: var(--color-text);
   padding: 6px 14px;
-  border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #222);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
   cursor: pointer;
 }
 
@@ -42,13 +48,13 @@
 }
 
 .prediction-option.correct {
-  border-color: #10b981;
-  background: light-dark(rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.2));
+  border-color: var(--color-accent-green);
+  background: rgba(50, 213, 131, 0.15);
 }
 
 .prediction-option.incorrect {
-  border-color: #ef4444;
-  background: light-dark(rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.2));
+  border-color: var(--color-danger);
+  background: rgba(240, 68, 56, 0.15);
 }
 
 .prediction-feedback {
@@ -57,13 +63,19 @@
 
 .prediction-feedback p {
   margin: 0 0 6px;
+  color: var(--color-text);
 }
 
 .prediction-feedback button {
   font: inherit;
+  color: var(--color-text);
   padding: 6px 14px;
-  border-radius: 6px;
-  border: 1px solid light-dark(#ccc, #444);
-  background: light-dark(#fff, #222);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
   cursor: pointer;
+}
+
+.prediction-feedback button:hover {
+  border-color: var(--color-accent-blue);
 }
