@@ -3,7 +3,7 @@ export interface ArrayValidation {
   error?: string
 }
 
-const MAX_LENGTH = 20
+const DEFAULT_MAX_LENGTH = 20
 
 // Counting sort buckets by value directly (bucketIndex === value) and radix
 // sort buckets by digit (Math.floor(v / exp) % 10, which goes negative for
@@ -11,12 +11,18 @@ const MAX_LENGTH = 20
 // Everything else just needs a reasonably-sized array of whole numbers.
 const REQUIRES_NON_NEGATIVE = new Set(['counting', 'radix'])
 
-export function validateArray(array: number[], algorithmId: string): ArrayValidation {
+export function validateArray(
+  array: number[],
+  algorithmId: string,
+  options: { maxLength?: number } = {},
+): ArrayValidation {
+  const maxLength = options.maxLength ?? DEFAULT_MAX_LENGTH
+
   if (array.length === 0) {
     return { valid: false, error: 'Enter at least one number.' }
   }
-  if (array.length > MAX_LENGTH) {
-    return { valid: false, error: `Use ${MAX_LENGTH} numbers or fewer so the animation stays readable.` }
+  if (array.length > maxLength) {
+    return { valid: false, error: `Use ${maxLength} numbers or fewer so the animation stays readable.` }
   }
   if (!array.every(Number.isInteger)) {
     return { valid: false, error: 'All values must be whole numbers.' }

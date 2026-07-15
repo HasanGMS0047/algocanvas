@@ -9,24 +9,31 @@ interface Node {
 // Chosen to exercise all three delete cases in sequence without disturbing
 // the right subtree: delete 4 (leaf) turns 6 into a one-child node; delete 6
 // (one child) splices 7 up to be 3's direct right child; delete 3 (now two
-// children: 1 and 7) exercises the successor-replace case.
-const INSERT_SEQUENCE = [8, 3, 10, 1, 6, 14, 4, 7, 13]
-const SEARCH_HIT = 7
-const SEARCH_MISS = 5
-const DELETE_SEQUENCE = [4, 6, 3]
+// children: 1 and 7) exercises the successor-replace case. Used as the
+// default when no custom sequence is provided.
+export const DEFAULT_INSERT_SEQUENCE = [8, 3, 10, 1, 6, 14, 4, 7, 13]
 
-export function* binarySearchTree(): Generator<TreeStep> {
+export function* binarySearchTree(insertSequence: number[] = DEFAULT_INSERT_SEQUENCE): Generator<TreeStep> {
   let root: Node | null = null
 
-  for (const value of INSERT_SEQUENCE) {
+  for (const value of insertSequence) {
     root = yield* insert(root, value, null, null)
   }
 
-  yield* search(root, SEARCH_HIT)
-  yield* search(root, SEARCH_MISS)
+  if (insertSequence.length > 0) {
+    // Guaranteed hit: the last value inserted. Guaranteed miss: one past the
+    // max, so it can never collide with anything actually in the tree.
+    const searchHit = insertSequence[insertSequence.length - 1]
+    const searchMiss = Math.max(...insertSequence) + 1
+    yield* search(root, searchHit)
+    yield* search(root, searchMiss)
+  }
 
-  for (const value of DELETE_SEQUENCE) {
-    root = yield* removeFrom(root, value, null, null)
+  if (insertSequence.length > 1) {
+    // Delete the first value inserted - for a custom sequence there's no way
+    // to guarantee which delete case (leaf/one-child/two-child) this hits,
+    // unlike the curated default, but it's always a valid, present value.
+    root = yield* removeFrom(root, insertSequence[0], null, null)
   }
 
   yield { type: 'done' }

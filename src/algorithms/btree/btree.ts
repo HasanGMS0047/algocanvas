@@ -13,13 +13,14 @@ const MAX_KEYS = 2 * MIN_DEGREE - 1
 
 // 10,20,5 fill the root; 6 forces it to split (the tree grows a level);
 // 12,30,7 fill the right-then-left leaf; 17 forces a second, non-root split.
-const INSERT_SEQUENCE = [10, 20, 5, 6, 12, 30, 7, 17]
+// Used as the default when no custom sequence is provided.
+export const DEFAULT_INSERT_SEQUENCE = [10, 20, 5, 6, 12, 30, 7, 17]
 
-export function* bTree(): Generator<BTreeStep> {
+export function* bTree(insertSequence: number[] = DEFAULT_INSERT_SEQUENCE): Generator<BTreeStep> {
   let root: Node = { keys: [], children: [] }
   yield { type: 'start', snapshot: null }
 
-  for (const key of INSERT_SEQUENCE) {
+  for (const key of insertSequence) {
     root = yield* insert(root, key)
   }
 

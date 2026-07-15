@@ -10,13 +10,14 @@ interface Node {
 // Chosen to hit both rotation shapes: 10,20,30 forces a single left rotation
 // (RR case) as soon as it's inserted; 40,50 forces another single left
 // rotation; then 25 forces a right-then-left double rotation (RL case) at
-// the root. Scoped to insert only - delete-with-rebalancing is a distinct,
-// more involved algorithm and isn't what this step is demonstrating.
-const INSERT_SEQUENCE = [10, 20, 30, 40, 50, 25]
+// the root. Used as the default when no custom sequence is provided. Scoped
+// to insert only - delete-with-rebalancing is a distinct, more involved
+// algorithm and isn't what this step is demonstrating.
+export const DEFAULT_INSERT_SEQUENCE = [10, 20, 30, 40, 50, 25]
 
-export function* avlTree(): Generator<TreeStep> {
+export function* avlTree(insertSequence: number[] = DEFAULT_INSERT_SEQUENCE): Generator<TreeStep> {
   let root: Node | null = null
-  for (const value of INSERT_SEQUENCE) {
+  for (const value of insertSequence) {
     root = yield* insert(root, value, null, null)
   }
   yield { type: 'done' }
