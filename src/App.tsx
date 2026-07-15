@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { SORT_ALGORITHMS } from './algorithms'
 import { BTREE_ALGORITHMS } from './algorithms/btree'
 import { recordBTreeFrames } from './algorithms/btree/recordBTreeFrames'
@@ -14,6 +14,7 @@ import { recordTreeFrames } from './algorithms/tree/recordTreeFrames'
 import { TRIE_ALGORITHMS } from './algorithms/trie'
 import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
 import { AppHeader } from './components/AppHeader'
+import { ArrayInput } from './components/ArrayInput'
 import { Visualizer } from './components/Visualizer'
 import { avlPredictor } from './predict/avlPredictor'
 import { quickSortPredictor } from './predict/quickSortPredictor'
@@ -25,8 +26,9 @@ import { renderHashTableFrame } from './render/renderHashTable'
 import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
 import { useAlgorithmKind } from './useAlgorithmKind'
+import { validateArray } from './validateArray'
 
-const DEMO_ARRAY = [8, 3, 9, 1, 6, 4, 7, 2, 5, 10]
+const DEFAULT_ARRAY = [8, 3, 9, 1, 6, 4, 7, 2, 5, 10]
 const ALL_ALGORITHMS = [
   ...SORT_ALGORITHMS,
   ...DISTRIBUTION_ALGORITHMS,
@@ -36,21 +38,31 @@ const ALL_ALGORITHMS = [
   ...TRIE_ALGORITHMS,
   ...HASHTABLE_ALGORITHMS,
 ]
+const SORT_AND_DIST_IDS = new Set([...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS].map((a) => a.id))
 
 function App() {
   const [algorithmId, setAlgorithmId] = useState(ALL_ALGORITHMS[0].id)
+  const [customArray, setCustomArray] = useState<number[]>(DEFAULT_ARRAY)
+
+  const validation = useMemo(() => validateArray(customArray, algorithmId), [customArray, algorithmId])
+  const effectiveArray = validation.valid ? customArray : DEFAULT_ARRAY
 
   const sort = useAlgorithmKind(
     algorithmId,
     SORT_ALGORITHMS,
-    (a) => recordFrames(DEMO_ARRAY, a.run),
+    (a) => recordFrames(effectiveArray, a.run),
     (ctx, w, h, frame, a) => renderArrayFrame(ctx, w, h, frame, { treeOverlay: a.treeOverlay }),
+    [effectiveArray],
   )
   const dist = useAlgorithmKind(
     algorithmId,
     DISTRIBUTION_ALGORITHMS,
-    (a) => recordDistributionFrames(a.demoArray, a.bucketCount, a.run),
+    (a) => {
+      const bucketCount = a.id === 'counting' ? Math.max(...effectiveArray) + 1 : a.bucketCount
+      return recordDistributionFrames(effectiveArray, bucketCount, a.run)
+    },
     renderBucketFrame,
+    [effectiveArray],
   )
   const graph = useAlgorithmKind(algorithmId, GRAPH_ALGORITHMS, (a) => recordGraphFrames(a.run), renderGraphFrame)
   const tree = useAlgorithmKind(algorithmId, TREE_ALGORITHMS, (a) => recordTreeFrames(a.run), renderTreeFrame)
@@ -66,6 +78,9 @@ function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <AppHeader algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
+      {SORT_AND_DIST_IDS.has(algorithmId) && (
+        <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />
+      )}
       {sort && (
         <Visualizer
           key={algorithmId}
