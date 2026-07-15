@@ -22,10 +22,12 @@ export type GraphStep =
   | { type: 'visit'; nodeId: string }
   | { type: 'visitEdge'; from: string; to: string }
   | { type: 'relax'; nodeId: string; distance: number }
+  | { type: 'acceptEdge'; from: string; to: string }
   | { type: 'done' }
 
 export interface GraphFrame {
   step: GraphStep
   visited: string[]
   distances: Record<string, number>
+  mstEdges: Array<{ from: string; to: string }>
 }

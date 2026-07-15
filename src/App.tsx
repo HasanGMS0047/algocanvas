@@ -204,6 +204,7 @@ function App() {
           startNode={effectiveStart}
           onStartNodeChange={setCustomStartNode}
           nodeIds={effectiveGraph.nodes.map((n) => n.id)}
+          showStartNode={GRAPH_ALGORITHMS.find((a) => a.id === algorithmId)?.usesStart ?? true}
         />
       )}
       {sort && (
