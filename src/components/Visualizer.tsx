@@ -1,23 +1,21 @@
 import { useCallback } from 'react'
-import type { Frame } from '../algorithms/recordFrames'
 import { usePlayer } from '../player/usePlayer'
-import { renderArrayFrame } from '../render/renderArray'
 import { AlgoCanvas } from './AlgoCanvas'
 import { PlayerControls } from './PlayerControls'
 
-interface SortVisualizerProps {
-  frames: Frame[]
-  treeOverlay?: boolean
+interface VisualizerProps<T> {
+  frames: T[]
+  render: (ctx: CanvasRenderingContext2D, width: number, height: number, frame: T) => void
 }
 
-export function SortVisualizer({ frames, treeOverlay }: SortVisualizerProps) {
+export function Visualizer<T>({ frames, render }: VisualizerProps<T>) {
   const player = usePlayer({ frameCount: frames.length, msPerFrame: 500 })
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-      renderArrayFrame(ctx, width, height, frames[player.index], { treeOverlay })
+      render(ctx, width, height, frames[player.index])
     },
-    [frames, player.index, treeOverlay],
+    [frames, player.index, render],
   )
 
   return (
