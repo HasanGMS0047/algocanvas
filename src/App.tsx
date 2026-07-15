@@ -4,6 +4,8 @@ import { BTREE_ALGORITHMS } from './algorithms/btree'
 import { recordBTreeFrames } from './algorithms/btree/recordBTreeFrames'
 import { DISTRIBUTION_ALGORITHMS } from './algorithms/distribution'
 import { recordDistributionFrames } from './algorithms/distribution/recordDistributionFrames'
+import { GRAPH_ALGORITHMS } from './algorithms/graph'
+import { recordGraphFrames } from './algorithms/graph/recordGraphFrames'
 import { HASHTABLE_ALGORITHMS } from './algorithms/hashtable'
 import { recordHashTableFrames } from './algorithms/hashtable/recordHashTableFrames'
 import { recordFrames } from './algorithms/recordFrames'
@@ -18,6 +20,7 @@ import { quickSortPredictor } from './predict/quickSortPredictor'
 import { renderArrayFrame } from './render/renderArray'
 import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
+import { renderGraphFrame } from './render/renderGraph'
 import { renderHashTableFrame } from './render/renderHashTable'
 import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
@@ -27,6 +30,7 @@ const DEMO_ARRAY = [8, 3, 9, 1, 6, 4, 7, 2, 5, 10]
 const ALL_ALGORITHMS = [
   ...SORT_ALGORITHMS,
   ...DISTRIBUTION_ALGORITHMS,
+  ...GRAPH_ALGORITHMS,
   ...TREE_ALGORITHMS,
   ...BTREE_ALGORITHMS,
   ...TRIE_ALGORITHMS,
@@ -48,6 +52,7 @@ function App() {
     (a) => recordDistributionFrames(a.demoArray, a.bucketCount, a.run),
     renderBucketFrame,
   )
+  const graph = useAlgorithmKind(algorithmId, GRAPH_ALGORITHMS, (a) => recordGraphFrames(a.run), renderGraphFrame)
   const tree = useAlgorithmKind(algorithmId, TREE_ALGORITHMS, (a) => recordTreeFrames(a.run), renderTreeFrame)
   const bTree = useAlgorithmKind(algorithmId, BTREE_ALGORITHMS, (a) => recordBTreeFrames(a.run), renderBTreeFrame)
   const trie = useAlgorithmKind(algorithmId, TRIE_ALGORITHMS, (a) => recordTrieFrames(a.run), renderTrieFrame)
@@ -70,6 +75,7 @@ function App() {
         />
       )}
       {dist && <Visualizer key={algorithmId} frames={dist.frames} render={dist.render} />}
+      {graph && <Visualizer key={algorithmId} frames={graph.frames} render={graph.render} />}
       {tree && (
         <Visualizer
           key={algorithmId}
