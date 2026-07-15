@@ -50,3 +50,21 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-text-muted);
 }
+
+.player-speed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-speed-slider {
+  width: 100px;
+  accent-color: var(--color-accent-purple);
+}
+
+.player-speed-label {
+  min-width: 3.5em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
