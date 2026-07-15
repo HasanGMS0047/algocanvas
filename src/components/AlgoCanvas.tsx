@@ -41,5 +41,5 @@ export function AlgoCanvas({ draw }: AlgoCanvasProps) {
 
   useEffect(redraw)
 
-  return <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
+  return <canvas ref={canvasRef} style={{ display: 'block', width: '100%', flex: '1 1 auto', minHeight: 0 }} />
 }
