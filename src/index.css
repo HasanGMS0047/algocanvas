@@ -53,17 +53,22 @@
     radial-gradient(circle at 85% 0%, rgba(0, 184, 204, 0.07), transparent 40%);
 }
 
+/* min-height (not a hard height) so a viewport too short for every panel
+   at once (e.g. predict mode + explain mode stacked on a phone) scrolls
+   instead of clipping content with no way to reach it - the canvas below
+   also gets a real min-height so it can never be squeezed to zero. */
 html,
 body,
 #root {
   margin: 0;
-  height: 100%;
   width: 100%;
+  min-height: 100%;
 }
 
 body {
   font: 16px/1.5 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: var(--bg-glow), var(--color-bg);
   color: var(--color-text);
   transition:

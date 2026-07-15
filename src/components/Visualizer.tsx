@@ -7,6 +7,7 @@ import { AlgoCanvas } from './AlgoCanvas'
 import { ExplanationPanel, ExplanationToggle } from './ExplanationPanel'
 import { PlayerControls } from './PlayerControls'
 import { PredictionPanel, PredictionToggle } from './PredictionPanel'
+import './Visualizer.css'
 
 interface VisualizerProps<T> {
   frames: T[]
@@ -53,8 +54,12 @@ export function Visualizer<T>({ frames, render, predictor, explainer, algorithmI
 
   return (
     <>
-      {predictor && <PredictionToggle enabled={predictModeEnabled} onChange={setPredictModeEnabled} />}
-      {explainer && <ExplanationToggle enabled={explainModeEnabled} onChange={setExplainModeEnabled} />}
+      {(predictor || explainer) && (
+        <div className="visualizer-toggles">
+          {predictor && <PredictionToggle enabled={predictModeEnabled} onChange={setPredictModeEnabled} />}
+          {explainer && <ExplanationToggle enabled={explainModeEnabled} onChange={setExplainModeEnabled} />}
+        </div>
+      )}
       <AlgoCanvas draw={draw} />
       {prediction && (
         <PredictionPanel
