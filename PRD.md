@@ -1,118 +1,142 @@
 # AlgoCanvas — Product Requirements Document
 
 ## 1. Vision
-A playground where every algorithm becomes an animation. Users pick an algorithm,
-watch it run step-by-step on a canvas, and can pause, rewind, or scrub through
-execution frame-by-frame — like a video player for algorithms.
 
-## 2. Full scope
+**"The Interactive Algorithm Laboratory."**
 
-### Visualizations
-- **Comparison sorts:** Bubble Sort, Selection Sort, Insertion Sort, Quick Sort, Merge Sort, Heap Sort
-- **Non-comparison sorts:** Counting Sort, Radix Sort, Bucket Sort
-- **Graph:** BFS, DFS, Dijkstra
-- **Trees:** Binary Tree, Binary Search Tree (BST), AVL Tree, Red-Black Tree, B-Tree, Trie
-  - Full/Complete/Perfect are *shape classifications*, not build algorithms — shown as a
-    "check shape" overlay on the Binary Tree visualizer, not a separate feature.
-- **Hashing:** Hash Table (with collision resolution shown)
+AlgoCanvas is moving from "pick a fixed demo, watch it animate" to a platform
+where users bring their own problems — their own array, their own graph, their
+own tree — and watch the algorithm actually solve *that*. The flagship
+differentiator on top of that is **"Think Like the Algorithm" mode**: instead
+of just watching, the app pauses before each meaningful decision and asks the
+user to predict it first, then reveals and explains what really happened.
 
-### Playback controls
-- Play / Pause
-- Step forward / Step back (single frame)
-- Scrub via a timeline/slider
-- Speed control (0.5x–4x)
-- Reset
+The interface should feel premium: dark theme, considered typography,
+smooth motion, a canvas that invites exploration rather than a static demo
+page.
 
-### Non-goals (any phase)
-- User-authored/custom algorithms
-- Multi-algorithm race/comparison view
-- Mobile-optimized layout
-- Accounts, saved sessions, sharing
+## 2. What exists today (v1 — shipped)
 
-## 3. Tech stack
-- **Language:** TypeScript
-- **UI:** React
-- **Rendering:** Canvas 2D (`<canvas>` + 2D context), no WebGL in v1
-- **Build tool:** Vite
-- **Testing:** Vitest for algorithm/generator logic
+16 algorithms, each fully interactive (play/pause/step/scrub/speed,
+keyboard shortcuts), built on a shared generator → recorder → renderer
+architecture (§4), with a 108-test Vitest suite covering correctness and
+structural invariants:
 
-## 4. Core architecture
+- **Comparison sorts (6):** Bubble, Selection, Insertion, Quick, Merge, Heap
+- **Non-comparison sorts (3):** Counting, Radix, Bucket
+- **Trees (6):** Binary Tree (+ full/complete/perfect shape classification),
+  BST (insert/search/delete, all 3 delete cases), AVL (rotations), Red-Black
+  (color + rotations), B-Tree (multi-key nodes, splits), Trie (prefix sharing)
+- **Hashing (1):** Hash Table with chaining collision resolution
+
+**Known gap:** graph algorithms (BFS, DFS, Dijkstra) were in the original
+scope for this phase and were never actually built — the build order skipped
+straight from sorts to trees. This should be treated as unfinished v1 work,
+not new scope.
+
+**The core limitation driving this rewrite of the PRD:** every algorithm
+runs against a single hardcoded demo input, chosen by hand to exercise
+interesting cases (collisions, rotations, splits, etc.). There is no way for
+a user to supply their own array, graph, or tree. That was the original
+complaint that started this planning pass, and it's the most important gap
+to close.
+
+## 3. What this PRD does *not* commit to (yet)
+
+The following were part of an early, much larger wishlist (auth, a Postgres
++ Redis backend, a real LLM-backed AI tutor, an embedded Monaco code editor
+with live execution/debugging, collaborative multi-user sessions, GIF/video/
+PDF export, a challenge mode with leaderboards and XP, Docker/Vercel/Railway
+deployment). Each of those is a substantial subsystem in its own right —
+weeks of work for a real backend team, not a feature to bolt onto a
+client-only Vite app in a session. Attempting all of it at once would mean
+mostly hollow stubs: an "AI Tutor" panel with no model behind it, an "export
+video" button that doesn't export anything. That directly contradicts how
+this project has actually been built so far — small, verified, real slices.
+
+These stay on the table as a *possible* future direction if AlgoCanvas ever
+grows into a longer-term or multi-person project, but nothing in the phases
+below assumes they exist.
+
+## 4. Core architecture (unchanged, proven across 16 algorithms)
 
 ### 4.1 Algorithm-as-generator
-Every algorithm is implemented as a JS/TS generator function that `yield`s a
-**step** object describing what changed, rather than mutating shared state and
-animating live. Example shape:
-
-```ts
-type Step =
-  | { type: "compare"; indices: [number, number] }
-  | { type: "swap"; indices: [number, number] }
-  | { type: "overwrite"; index: number; value: number }
-  | { type: "recurse"; range: [number, number] }
-  | { type: "done" };
-
-function* quickSort(arr: number[]): Generator<Step> { ... }
-```
+Every algorithm is a generator function that `yield`s a **step** object
+describing what changed, rather than mutating shared state and animating
+live directly.
 
 ### 4.2 Frame recording
-On "Run", the generator is fully drained up front into an array of
-`{ step, arraySnapshot }` frames. This is what makes rewind/step-back/scrub
-free — the player is just an index into a precomputed array, never
-re-executing the algorithm.
+The generator is drained up front into an array of frames. This is what
+makes rewind/step-back/scrub free — the player indexes into a precomputed
+array, never re-executing the algorithm. New for predict-mode: recording
+also needs to mark *which* frames are "decision points" worth pausing at
+(see Phase 7).
 
 ### 4.3 Renderer
-A pure function `render(ctx, frame)` draws the current frame's state
-(bars, nodes, edges, hash buckets) to the canvas. Rendering is a stateless
-function of `(frame index)` — no incremental drawing logic to keep in sync.
+A pure function of `(ctx, width, height, frame)` — no incremental drawing
+state to keep in sync. Different visualization families (bars, trees,
+buckets, node/edge graphs) get their own renderer sharing this shape.
 
 ### 4.4 Player
-A small state machine (`idle | playing | paused | done`) driving a
-`requestAnimationFrame` loop that advances the frame index according to
-speed, or is driven directly by the scrub slider / step buttons.
+A state machine driving playback, now needing a new state for predict-mode:
+`idle | playing | paused | awaiting-prediction | done`.
 
-## 5. Build phases (one PR-sized chunk at a time)
+## 5. Roadmap (next phases, in order)
 
-Phases are not "v1/v2" cutoffs users see — they're just the order you build in.
-Every phase after Phase 1 slots into the same architecture unchanged.
+Each phase is still one PR-sized chunk at a time, verified in-browser and
+committed individually — same discipline as v1.
 
-**Phase 1 — Skeleton (proves the architecture works at all)**
-1. Project scaffold (Vite + React + TS), empty canvas, no algorithms yet
-2. Player component: play/pause/step/scrub/speed, wired to a fake/dummy step sequence
-3. Array renderer (bars) + Bubble Sort generator — simplest possible real algorithm,
-   first true end-to-end slice
+**Phase 7 — "Think Like the Algorithm" (predict mode)**
+- Extend the step vocabulary so specific step types can be flagged as
+  "decision points" (pivot choice in Quick Sort, next node in BFS/DFS,
+  minimum tentative distance in Dijkstra once it exists, rotation case in
+  AVL/RB, etc.)
+- Player pauses at a decision point, shows a prediction UI (e.g. "which
+  bucket/node/index?"), accepts the user's guess
+- On reveal: show correct vs. predicted, continue the animation, explain why
+- Start with 2–3 algorithms that have the clearest decision points (Quick
+  Sort pivot/partition, BST/AVL insert direction, one graph algorithm once
+  Phase 9 lands) rather than retrofitting all 16 at once
 
-**Phase 2 — Comparison sorts (same renderer, cements the generator pattern)**
-4. Selection Sort, Insertion Sort
-5. Quick Sort, Merge Sort (recursive control flow — first real test of the pattern)
-6. Heap Sort (needs a small heap/tree overlay on the array view)
+**Phase 8 — Visual redesign**
+- Dark theme as default: background `#09090B`, panels `#18181B`, accents
+  (blue `#4F8BFF`, purple `#7C5CFC`, green `#32D583`, orange `#F79009`,
+  danger `#F04438`) — reusing these as the new highlight-color system
+  instead of the current ad hoc per-renderer colors
+- Inter typeface, larger type scale, generous spacing, 16px rounded corners
+- Landing/intro treatment for the algorithm picker; this is a visual pass,
+  not a new page/routing structure
 
-**Phase 3 — Non-comparison sorts (new renderer needs: buckets/digits)**
-7. Counting Sort
-8. Radix Sort
-9. Bucket Sort
+**Phase 9 — Graph algorithms (the missed v1 phase)**
+- Graph renderer (nodes/edges, force-ish fixed layout — doesn't need to be
+  physics-based)
+- BFS, DFS, Dijkstra
 
-**Phase 4 — Graphs**
-10. Graph renderer (nodes/edges) + BFS, DFS
-11. Dijkstra (extends graph renderer with weights/distances)
+**Phase 10 — Custom user input**
+- Per-algorithm input UI appropriate to its data shape: array editor for
+  sorts, node/edge editor for graphs and trees
+- Validate input against each algorithm's preconditions (e.g. BST insert
+  sequence, connected graph for Dijkstra) with clear error states
+- Random / worst-case / best-case generators as a fallback to typing values
+  by hand
+- This directly replaces the fixed `DEMO_ARRAY` / hardcoded insert
+  sequences used throughout v1
 
-**Phase 5 — Trees (new renderer: nodes/edges laid out hierarchically)**
-12. Tree renderer + Binary Tree (insert/search) + shape-classification overlay
-    (full/complete/perfect)
-13. Binary Search Tree (insert/delete/search with BST invariant)
-14. AVL Tree (adds rotations for self-balancing)
-15. Red-Black Tree (adds color + rotation rules)
-16. B-Tree (multi-way node splits/merges — biggest renderer change so far)
-17. Trie (char-by-char renderer, distinct from numeric trees)
-
-**Phase 6 — Hashing & polish**
-18. Hash Table visualization (collision resolution shown) + renderer
-19. Polish pass: speed presets, keyboard shortcuts, responsive layout
+**Phase 11 — Algorithm library expansion**
+Only after 7–10 are solid. Candidates, roughly in order of reusing existing
+renderers vs. needing new ones:
+- Searching: Linear, Binary, Jump, Interpolation (reuse array renderer)
+- More graphs: Bellman-Ford, Floyd-Warshall, Prim, Kruskal, Topological
+  Sort, A*, Union-Find (reuse graph renderer from Phase 9)
+- Dynamic programming: Knapsack, LCS, Coin Change, Edit Distance, LIS
+  (new renderer: DP table with dependency arrows)
+- Backtracking: N-Queens, Sudoku, Maze (new renderer: grid + search tree)
+- Greedy: Huffman, Activity Selection, Fractional Knapsack
 
 ## 6. Success criteria
-- Every algorithm above is selectable, runs correctly, and matches its
-  textbook step semantics (verified with unit tests on the generator output,
-  not just visually).
-- Pause/step/rewind/scrub work identically for every algorithm because they
-  all go through the same frame-recording/player architecture.
-- Each commit in git history corresponds to one working, reviewed feature
-  from the build order above.
+- Every phase ships as working, verified, committed slices — no feature is
+  "checked off" without running correctly in the browser first.
+- Predict-mode (Phase 7) is judged on whether it actually changes how it
+  feels to use the app, not on how many algorithms support it initially.
+- Custom input (Phase 10) must handle invalid input gracefully for every
+  algorithm it's added to, not just the happy path.
