@@ -1,9 +1,7 @@
-.algorithm-select {
+.theme-menu {
   flex: 0 0 auto;
   font: inherit;
   padding: 8px 14px;
-  max-width: 100%;
-  box-sizing: border-box;
   background: var(--color-panel);
   color: var(--color-text);
   border: 1px solid var(--color-border);
@@ -14,9 +12,9 @@
     box-shadow 150ms ease;
 }
 
-.algorithm-select:hover,
-.algorithm-select:focus-visible {
-  border-color: var(--color-accent-blue);
+.theme-menu:hover,
+.theme-menu:focus-visible {
+  border-color: var(--color-accent-purple);
   box-shadow: var(--focus-glow);
   outline: none;
 }

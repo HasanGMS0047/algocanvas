@@ -41,6 +41,19 @@
   border: 1px solid var(--color-border);
   background: var(--color-panel);
   cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 100ms ease;
+}
+
+.prediction-option:hover:not(:disabled) {
+  border-color: var(--color-accent-purple);
+  box-shadow: var(--focus-glow);
+}
+
+.prediction-option:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .prediction-option:disabled {
@@ -74,8 +87,17 @@
   border: 1px solid var(--color-border);
   background: var(--color-panel);
   cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 100ms ease;
 }
 
 .prediction-feedback button:hover {
   border-color: var(--color-accent-blue);
+  box-shadow: var(--focus-glow);
+}
+
+.prediction-feedback button:active {
+  transform: scale(0.96);
 }

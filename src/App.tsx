@@ -39,6 +39,7 @@ import { explainTreeStep } from './explain/treeExplainer'
 import { explainTrieStep } from './explain/trieExplainer'
 import { avlPredictor } from './predict/avlPredictor'
 import { quickSortPredictor } from './predict/quickSortPredictor'
+import type { ThemeId } from './render/palette'
 import { renderArrayFrame } from './render/renderArray'
 import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
@@ -48,6 +49,7 @@ import { renderLisFrame } from './render/renderLis'
 import { renderSearchFrame } from './render/renderSearch'
 import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
+import { applyTheme, loadTheme, saveTheme } from './theme/theme'
 import { useAlgorithmKind } from './useAlgorithmKind'
 import { validateArray } from './validateArray'
 import { validateWords } from './validateWords'
@@ -81,6 +83,17 @@ const BINARY_TREE_IDS = new Set(BINARY_TREE_ALGORITHMS.map((a) => a.id))
 const DEFAULT_TREE_SHAPE_TEXT = treeShapeToText(BINARY_TREE_ALGORITHMS[0].defaultShape)
 
 function App() {
+  const [themeId, setThemeId] = useState<ThemeId>(() => {
+    const saved = loadTheme()
+    applyTheme(saved)
+    return saved
+  })
+  const handleThemeChange = (id: ThemeId) => {
+    applyTheme(id)
+    saveTheme(id)
+    setThemeId(id)
+  }
+
   const [algorithmId, setAlgorithmId] = useState(ALL_ALGORITHMS[0].id)
   const [customArray, setCustomArray] = useState<number[]>(DEFAULT_ARRAY)
   const [customTreeSequence, setCustomTreeSequence] = useState<number[] | null>(null)
@@ -219,7 +232,13 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-      <AppHeader algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
+      <AppHeader
+        algorithms={ALL_ALGORITHMS}
+        selectedId={algorithmId}
+        onChange={setAlgorithmId}
+        themeId={themeId}
+        onThemeChange={handleThemeChange}
+      />
       {NUMBER_ARRAY_IDS.has(algorithmId) && (
         <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />
       )}

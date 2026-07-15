@@ -18,10 +18,19 @@
   border-radius: var(--radius-sm);
   padding: 6px 12px;
   cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 100ms ease;
 }
 
 .player-controls button:hover:not(:disabled) {
   border-color: var(--color-accent-blue);
+  box-shadow: var(--focus-glow);
+}
+
+.player-controls button:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .player-controls button:disabled {
