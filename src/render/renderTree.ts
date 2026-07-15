@@ -4,6 +4,7 @@ const RADIUS = 18
 const COLOR_NODE = '#3b82f6'
 const COLOR_ACTIVE = '#f59e0b'
 const COLOR_FOUND = '#10b981'
+const COLOR_ROTATE = '#a855f7'
 const COLOR_EDGE = 'rgba(128, 128, 128, 0.5)'
 const TOP_MARGIN = 56
 const BOTTOM_MARGIN = 24
@@ -124,6 +125,8 @@ function getHighlight(step: TreeStep): { value: number; color: string } | undefi
       return { value: step.value, color: COLOR_FOUND }
     case 'replace':
       return { value: step.withValue, color: COLOR_ACTIVE }
+    case 'rotate':
+      return { value: step.pivotValue, color: COLOR_ROTATE }
     default:
       return undefined
   }
@@ -147,6 +150,8 @@ function describeStep(step: TreeStep): string {
       return `replace ${step.value} with ${step.withValue}`
     case 'remove':
       return `remove ${step.value}`
+    case 'rotate':
+      return `rotate ${step.direction} at ${step.pivotValue}`
     case 'classify':
       return 'classify shape'
     case 'done':

@@ -12,6 +12,8 @@ export function recordTreeFrames(run: () => Generator<TreeStep>): TreeFrame[] {
       root = replaceValue(root, step.value, step.withValue)
     } else if (step.type === 'remove') {
       root = removeNode(root, step.parentValue, step.side)
+    } else if (step.type === 'rotate') {
+      root = rotateNode(root, step.direction, step.parentValue, step.side)
     } else if (step.type === 'classify') {
       classification = { full: step.full, complete: step.complete, perfect: step.perfect }
     }
@@ -63,6 +65,40 @@ function removeNode(
   if (side === 'left') parent.left = replacement
   else parent.right = replacement
 
+  return next
+}
+
+// Rotations never relabel values (unlike delete's replace step), so there's
+// no transient-duplicate concern here - but we still navigate to the pivot
+// positionally (parent + side) for the same reason remove does: it's the
+// exact slot the algorithm meant, not a value that happens to match.
+function rotateNode(
+  root: TreeNodeSpec | null,
+  direction: 'left' | 'right',
+  parentValue: number | null,
+  side: 'left' | 'right' | null,
+): TreeNodeSpec | null {
+  const next = cloneTree(root)
+  if (!next) return next
+
+  const parent = parentValue === null ? null : findByValue(next, parentValue)
+  const target = parentValue === null ? next : side === 'left' ? parent!.left : parent!.right
+  if (!target) return next
+
+  let newSubRoot: TreeNodeSpec
+  if (direction === 'right') {
+    newSubRoot = target.left!
+    target.left = newSubRoot.right
+    newSubRoot.right = target
+  } else {
+    newSubRoot = target.right!
+    target.right = newSubRoot.left
+    newSubRoot.left = target
+  }
+
+  if (parentValue === null) return newSubRoot
+  if (side === 'left') parent!.left = newSubRoot
+  else parent!.right = newSubRoot
   return next
 }
 
