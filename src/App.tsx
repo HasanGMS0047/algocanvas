@@ -4,6 +4,8 @@ import { BTREE_ALGORITHMS } from './algorithms/btree'
 import { recordBTreeFrames } from './algorithms/btree/recordBTreeFrames'
 import { DISTRIBUTION_ALGORITHMS } from './algorithms/distribution'
 import { recordDistributionFrames } from './algorithms/distribution/recordDistributionFrames'
+import { DP_ALGORITHMS } from './algorithms/dp'
+import { recordLisFrames } from './algorithms/dp/recordLisFrames'
 import { GRAPH_ALGORITHMS } from './algorithms/graph'
 import { DEMO_GRAPH, DEMO_START } from './algorithms/graph/demoGraph'
 import { parseGraphText } from './algorithms/graph/parseGraphText'
@@ -31,6 +33,7 @@ import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
 import { renderGraphFrame } from './render/renderGraph'
 import { renderHashTableFrame } from './render/renderHashTable'
+import { renderLisFrame } from './render/renderLis'
 import { renderSearchFrame } from './render/renderSearch'
 import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
@@ -49,12 +52,13 @@ const ALL_ALGORITHMS = [
   ...BTREE_ALGORITHMS,
   ...TRIE_ALGORITHMS,
   ...HASHTABLE_ALGORITHMS,
+  ...DP_ALGORITHMS,
 ]
-// Sorts, distribution sorts, and searches all edit the same "array of
-// numbers" shape, so they share one ArrayInput row instead of each getting
-// its own duplicate editor.
+// Sorts, distribution sorts, searches, and this DP problem all edit the
+// same "array of numbers" shape, so they share one ArrayInput row instead
+// of each getting its own duplicate editor.
 const NUMBER_ARRAY_IDS = new Set(
-  [...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS, ...SEARCH_ALGORITHMS].map((a) => a.id),
+  [...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS, ...SEARCH_ALGORITHMS, ...DP_ALGORITHMS].map((a) => a.id),
 )
 const SEARCH_IDS = new Set(SEARCH_ALGORITHMS.map((a) => a.id))
 const TRIE_IDS = new Set(TRIE_ALGORITHMS.map((a) => a.id))
@@ -126,6 +130,14 @@ function App() {
     (a) => recordSearchFrames(searchArray, effectiveTarget, a.run),
     renderSearchFrame,
     [searchArray, effectiveTarget],
+  )
+
+  const lis = useAlgorithmKind(
+    algorithmId,
+    DP_ALGORITHMS,
+    (a) => recordLisFrames(effectiveArray, a.run),
+    renderLisFrame,
+    [effectiveArray],
   )
 
   const graphParse = useMemo(
@@ -217,6 +229,7 @@ function App() {
       )}
       {dist && <Visualizer key={algorithmId} frames={dist.frames} render={dist.render} />}
       {search && <Visualizer key={algorithmId} frames={search.frames} render={search.render} />}
+      {lis && <Visualizer key={algorithmId} frames={lis.frames} render={lis.render} />}
       {graph && <Visualizer key={algorithmId} frames={graph.frames} render={graph.render} />}
       {tree && (
         <Visualizer
