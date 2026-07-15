@@ -16,6 +16,11 @@ export function useAlgorithmKind<A extends AlgorithmWithId, F>(
   render: (ctx: CanvasRenderingContext2D, width: number, height: number, frame: F, algorithm: A) => void,
 ): { frames: F[]; render: (ctx: CanvasRenderingContext2D, width: number, height: number, frame: F) => void } | null {
   const algorithm = algorithms.find((a) => a.id === algorithmId)
+  // recordFrames is a fresh closure each render (App.tsx passes an inline
+  // arrow function per kind) but its behavior is stable, so keying only on
+  // `algorithm` is intentional - including recordFrames would defeat the
+  // memoization and re-run every render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const frames = useMemo(() => (algorithm ? recordFrames(algorithm) : null), [algorithm])
 
   if (!algorithm || !frames) return null
