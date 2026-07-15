@@ -5,6 +5,8 @@ const COLOR_NODE = '#3b82f6'
 const COLOR_ACTIVE = '#f59e0b'
 const COLOR_FOUND = '#10b981'
 const COLOR_ROTATE = '#a855f7'
+const COLOR_RB_RED = '#ef4444'
+const COLOR_RB_BLACK = '#27272a'
 const COLOR_EDGE = 'rgba(128, 128, 128, 0.5)'
 const TOP_MARGIN = 56
 const BOTTOM_MARGIN = 24
@@ -14,6 +16,7 @@ interface PositionedNode {
   value: number
   x: number
   depth: number
+  color?: 'red' | 'black'
   left?: PositionedNode
   right?: PositionedNode
 }
@@ -64,7 +67,7 @@ function layout(node: TreeNodeSpec | null, depth: number, counter: { n: number }
   const left = layout(node.left ?? null, depth + 1, counter)
   const x = counter.n++
   const right = layout(node.right ?? null, depth + 1, counter)
-  return { value: node.value, x, depth, left, right }
+  return { value: node.value, x, depth, color: node.color, left, right }
 }
 
 function drawEdges(
@@ -93,7 +96,12 @@ function drawNodes(
   const x = px(node.x)
   const y = py(node.depth)
 
-  ctx.fillStyle = node.value === highlight?.value ? highlight.color : COLOR_NODE
+  let fill: string = COLOR_NODE
+  if (node.color === 'red') fill = COLOR_RB_RED
+  else if (node.color === 'black') fill = COLOR_RB_BLACK
+  if (node.value === highlight?.value) fill = highlight.color
+
+  ctx.fillStyle = fill
   ctx.beginPath()
   ctx.arc(x, y, RADIUS, 0, Math.PI * 2)
   ctx.fill()
@@ -152,6 +160,8 @@ function describeStep(step: TreeStep): string {
       return `remove ${step.value}`
     case 'rotate':
       return `rotate ${step.direction} at ${step.pivotValue}`
+    case 'recolor':
+      return `recolor ${step.value} ${step.color}`
     case 'classify':
       return 'classify shape'
     case 'done':
