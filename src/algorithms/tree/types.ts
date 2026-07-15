@@ -12,6 +12,13 @@ export type TreeStep =
   | { type: 'notFound'; target: number }
   | { type: 'replace'; value: number; withValue: number }
   | { type: 'remove'; value: number; parentValue: number | null; side: 'left' | 'right' | null }
+  | {
+      type: 'rotate'
+      direction: 'left' | 'right'
+      pivotValue: number
+      parentValue: number | null
+      side: 'left' | 'right' | null
+    }
   | { type: 'classify'; full: boolean; complete: boolean; perfect: boolean }
   | { type: 'done' }
 
