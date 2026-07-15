@@ -12,6 +12,8 @@ import { graphToText } from './algorithms/graph/utils'
 import { HASHTABLE_ALGORITHMS } from './algorithms/hashtable'
 import { recordHashTableFrames } from './algorithms/hashtable/recordHashTableFrames'
 import { recordFrames } from './algorithms/recordFrames'
+import { SEARCH_ALGORITHMS } from './algorithms/search'
+import { recordSearchFrames } from './algorithms/search/recordSearchFrames'
 import { TREE_ALGORITHMS } from './algorithms/tree'
 import { recordTreeFrames } from './algorithms/tree/recordTreeFrames'
 import { TRIE_ALGORITHMS } from './algorithms/trie'
@@ -19,6 +21,7 @@ import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
 import { AppHeader } from './components/AppHeader'
 import { ArrayInput } from './components/ArrayInput'
 import { GraphInput } from './components/GraphInput'
+import { TargetInput } from './components/TargetInput'
 import { Visualizer } from './components/Visualizer'
 import { WordListInput } from './components/WordListInput'
 import { avlPredictor } from './predict/avlPredictor'
@@ -28,6 +31,7 @@ import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
 import { renderGraphFrame } from './render/renderGraph'
 import { renderHashTableFrame } from './render/renderHashTable'
+import { renderSearchFrame } from './render/renderSearch'
 import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
 import { useAlgorithmKind } from './useAlgorithmKind'
@@ -39,13 +43,20 @@ const TREE_SEQUENCE_MAX_LENGTH = 12
 const ALL_ALGORITHMS = [
   ...SORT_ALGORITHMS,
   ...DISTRIBUTION_ALGORITHMS,
+  ...SEARCH_ALGORITHMS,
   ...GRAPH_ALGORITHMS,
   ...TREE_ALGORITHMS,
   ...BTREE_ALGORITHMS,
   ...TRIE_ALGORITHMS,
   ...HASHTABLE_ALGORITHMS,
 ]
-const SORT_AND_DIST_IDS = new Set([...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS].map((a) => a.id))
+// Sorts, distribution sorts, and searches all edit the same "array of
+// numbers" shape, so they share one ArrayInput row instead of each getting
+// its own duplicate editor.
+const NUMBER_ARRAY_IDS = new Set(
+  [...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS, ...SEARCH_ALGORITHMS].map((a) => a.id),
+)
+const SEARCH_IDS = new Set(SEARCH_ALGORITHMS.map((a) => a.id))
 const TRIE_IDS = new Set(TRIE_ALGORITHMS.map((a) => a.id))
 const DEFAULT_TRIE_WORDS = TRIE_ALGORITHMS[0].defaultWords
 const GRAPH_IDS = new Set(GRAPH_ALGORITHMS.map((a) => a.id))
@@ -58,6 +69,7 @@ function App() {
   const [customWords, setCustomWords] = useState<string[]>(DEFAULT_TRIE_WORDS)
   const [customGraphText, setCustomGraphText] = useState<string | null>(null)
   const [customStartNode, setCustomStartNode] = useState<string | null>(null)
+  const [customTarget, setCustomTarget] = useState<number | null>(null)
 
   const validation = useMemo(() => validateArray(customArray, algorithmId), [customArray, algorithmId])
   const effectiveArray = validation.valid ? customArray : DEFAULT_ARRAY
@@ -101,6 +113,21 @@ function App() {
     renderBucketFrame,
     [effectiveArray],
   )
+  const searchAlgorithm = SEARCH_ALGORITHMS.find((a) => a.id === algorithmId)
+  const searchArray = useMemo(
+    () => (searchAlgorithm?.requiresSorted ? [...effectiveArray].sort((a, b) => a - b) : effectiveArray),
+    [effectiveArray, searchAlgorithm],
+  )
+  const effectiveTarget = customTarget ?? searchArray[Math.floor(searchArray.length / 2)] ?? 0
+
+  const search = useAlgorithmKind(
+    algorithmId,
+    SEARCH_ALGORITHMS,
+    (a) => recordSearchFrames(searchArray, effectiveTarget, a.run),
+    renderSearchFrame,
+    [searchArray, effectiveTarget],
+  )
+
   const graphParse = useMemo(
     () => (customGraphText !== null ? parseGraphText(customGraphText) : null),
     [customGraphText],
@@ -152,9 +179,10 @@ function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <AppHeader algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
-      {SORT_AND_DIST_IDS.has(algorithmId) && (
+      {NUMBER_ARRAY_IDS.has(algorithmId) && (
         <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />
       )}
+      {SEARCH_IDS.has(algorithmId) && <TargetInput value={effectiveTarget} onChange={setCustomTarget} />}
       {treeDefault && (
         <ArrayInput
           value={customTreeSequence ?? treeDefault}
@@ -187,6 +215,7 @@ function App() {
         />
       )}
       {dist && <Visualizer key={algorithmId} frames={dist.frames} render={dist.render} />}
+      {search && <Visualizer key={algorithmId} frames={search.frames} render={search.render} />}
       {graph && <Visualizer key={algorithmId} frames={graph.frames} render={graph.render} />}
       {tree && (
         <Visualizer
