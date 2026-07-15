@@ -34,8 +34,9 @@ export function AlgoCanvas({ draw }: AlgoCanvasProps) {
     }
 
     resize()
-    window.addEventListener('resize', resize)
-    return () => window.removeEventListener('resize', resize)
+    const observer = new ResizeObserver(resize)
+    observer.observe(canvas)
+    return () => observer.disconnect()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

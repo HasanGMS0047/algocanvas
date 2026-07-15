@@ -30,7 +30,7 @@ export function PlayerControls({
   onSpeedChange,
 }: PlayerControlsProps) {
   return (
-    <div className="player-controls">
+    <div className="player-controls" title="Keyboard: Space play/pause · ←/→ step · Home/End jump to start/end">
       <button type="button" onClick={onReset}>
         Reset
       </button>
