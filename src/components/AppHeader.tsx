@@ -1,7 +1,8 @@
-import type { ThemeId } from '../render/palette'
+import type { ThemeState } from '../theme/theme'
+import type { ThemeColors } from '../theme/themes'
 import { AlgorithmSelect } from './AlgorithmSelect'
 import './AppHeader.css'
-import { ThemeMenu } from './ThemeMenu'
+import { ThemeManager } from './ThemeManager'
 
 interface AlgorithmOption {
   id: string
@@ -13,11 +14,21 @@ interface AppHeaderProps {
   algorithms: AlgorithmOption[]
   selectedId: string
   onChange: (id: string) => void
-  themeId: ThemeId
-  onThemeChange: (themeId: ThemeId) => void
+  themeState: ThemeState
+  onThemePresetChange: (presetId: string) => void
+  onThemeColorOverride: (key: keyof ThemeColors, value: string) => void
+  onThemeResetOverrides: () => void
 }
 
-export function AppHeader({ algorithms, selectedId, onChange, themeId, onThemeChange }: AppHeaderProps) {
+export function AppHeader({
+  algorithms,
+  selectedId,
+  onChange,
+  themeState,
+  onThemePresetChange,
+  onThemeColorOverride,
+  onThemeResetOverrides,
+}: AppHeaderProps) {
   return (
     <header className="app-header">
       <div className="app-brand">
@@ -25,7 +36,12 @@ export function AppHeader({ algorithms, selectedId, onChange, themeId, onThemeCh
         <p>Understand algorithms by watching them think.</p>
       </div>
       <div className="app-controls">
-        <ThemeMenu themeId={themeId} onChange={onThemeChange} />
+        <ThemeManager
+          themeState={themeState}
+          onPresetChange={onThemePresetChange}
+          onColorOverride={onThemeColorOverride}
+          onResetOverrides={onThemeResetOverrides}
+        />
         <AlgorithmSelect algorithms={algorithms} selectedId={selectedId} onChange={onChange} />
       </div>
     </header>

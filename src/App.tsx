@@ -39,7 +39,6 @@ import { explainTreeStep } from './explain/treeExplainer'
 import { explainTrieStep } from './explain/trieExplainer'
 import { avlPredictor } from './predict/avlPredictor'
 import { quickSortPredictor } from './predict/quickSortPredictor'
-import type { ThemeId } from './render/palette'
 import { renderArrayFrame } from './render/renderArray'
 import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
@@ -49,7 +48,8 @@ import { renderLisFrame } from './render/renderLis'
 import { renderSearchFrame } from './render/renderSearch'
 import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
-import { applyTheme, loadTheme, saveTheme } from './theme/theme'
+import { applyThemeState, loadThemeState, saveThemeState, type ThemeState } from './theme/theme'
+import type { ThemeColors } from './theme/themes'
 import { useAlgorithmKind } from './useAlgorithmKind'
 import { validateArray } from './validateArray'
 import { validateWords } from './validateWords'
@@ -83,15 +83,33 @@ const BINARY_TREE_IDS = new Set(BINARY_TREE_ALGORITHMS.map((a) => a.id))
 const DEFAULT_TREE_SHAPE_TEXT = treeShapeToText(BINARY_TREE_ALGORITHMS[0].defaultShape)
 
 function App() {
-  const [themeId, setThemeId] = useState<ThemeId>(() => {
-    const saved = loadTheme()
-    applyTheme(saved)
+  const [themeState, setThemeState] = useState<ThemeState>(() => {
+    const saved = loadThemeState()
+    applyThemeState(saved)
     return saved
   })
-  const handleThemeChange = (id: ThemeId) => {
-    applyTheme(id)
-    saveTheme(id)
-    setThemeId(id)
+
+  const handleThemePresetChange = (presetId: string) => {
+    const next: ThemeState = { presetId, overrides: {} }
+    applyThemeState(next)
+    saveThemeState(next)
+    setThemeState(next)
+  }
+
+  const handleThemeColorOverride = (key: keyof ThemeColors, value: string) => {
+    setThemeState((prev) => {
+      const next: ThemeState = { presetId: prev.presetId, overrides: { ...prev.overrides, [key]: value } }
+      applyThemeState(next)
+      saveThemeState(next)
+      return next
+    })
+  }
+
+  const handleThemeResetOverrides = () => {
+    const next: ThemeState = { presetId: themeState.presetId, overrides: {} }
+    applyThemeState(next)
+    saveThemeState(next)
+    setThemeState(next)
   }
 
   const [algorithmId, setAlgorithmId] = useState(ALL_ALGORITHMS[0].id)
@@ -236,8 +254,10 @@ function App() {
         algorithms={ALL_ALGORITHMS}
         selectedId={algorithmId}
         onChange={setAlgorithmId}
-        themeId={themeId}
-        onThemeChange={handleThemeChange}
+        themeState={themeState}
+        onThemePresetChange={handleThemePresetChange}
+        onThemeColorOverride={handleThemeColorOverride}
+        onThemeResetOverrides={handleThemeResetOverrides}
       />
       {NUMBER_ARRAY_IDS.has(algorithmId) && (
         <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />

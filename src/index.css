@@ -1,56 +1,30 @@
+/* Fallback values matching the Dark preset, so there's a sane theme
+   painted before JS applies the saved theme (theme/theme.ts sets these
+   same custom properties inline on :root, which wins once it runs). */
 :root {
   color-scheme: dark;
 
   --radius: 16px;
   --radius-sm: 8px;
-}
 
-/* Dark - the primary Neon Lab palette: vivid cyan/magenta/lime on
-   near-black. Also the fallback (bare :root) so there's a sane theme
-   before JS applies data-theme from localStorage. */
-:root,
-:root[data-theme='dark'] {
-  --color-bg: #0a0a0f;
-  --color-bg-secondary: #101018;
-  --color-panel: #15151f;
-  --color-border: #26263a;
-  --color-text: #eafeff;
-  --color-text-muted: #7a8699;
+  --color-bg: #09090b;
+  --color-bg-secondary: #111113;
+  --color-panel: #18181b;
+  --color-border: #27272a;
+  --color-text: #ffffff;
+  --color-text-muted: #a1a1aa;
 
-  --color-accent-blue: #00e5ff;
-  --color-accent-purple: #b06bff;
-  --color-accent-green: #9dff45;
-  --color-accent-orange: #ff2ec4;
-  --color-danger: #ff3b5c;
+  --color-accent-blue: #4f8bff;
+  --color-accent-purple: #7c5cfc;
+  --color-accent-green: #32d583;
+  --color-accent-orange: #f79009;
+  --color-danger: #f04438;
 
   --focus-glow:
-    0 0 0 3px rgba(0, 229, 255, 0.25),
-    0 0 18px rgba(0, 229, 255, 0.35);
-  --bg-glow: radial-gradient(circle at 15% -10%, rgba(176, 107, 255, 0.12), transparent 45%),
-    radial-gradient(circle at 85% 0%, rgba(0, 229, 255, 0.1), transparent 40%);
-}
-
-/* Night - a deeper, dimmer sibling: same neon family, lower brightness,
-   more blue-black undertone for a "late night in the lab" feel. */
-:root[data-theme='night'] {
-  --color-bg: #030308;
-  --color-bg-secondary: #07070f;
-  --color-panel: #0b0b16;
-  --color-border: #1c1c2e;
-  --color-text: #d8f7ff;
-  --color-text-muted: #5c6b7a;
-
-  --color-accent-blue: #00b8cc;
-  --color-accent-purple: #8a5cff;
-  --color-accent-green: #7dd93a;
-  --color-accent-orange: #d922a8;
-  --color-danger: #e0304f;
-
-  --focus-glow:
-    0 0 0 3px rgba(0, 184, 204, 0.2),
-    0 0 14px rgba(0, 184, 204, 0.3);
-  --bg-glow: radial-gradient(circle at 15% -10%, rgba(138, 92, 255, 0.08), transparent 45%),
-    radial-gradient(circle at 85% 0%, rgba(0, 184, 204, 0.07), transparent 40%);
+    0 0 0 3px rgba(79, 139, 255, 0.28),
+    0 0 16px rgba(79, 139, 255, 0.3);
+  --bg-glow: radial-gradient(circle at 15% -10%, rgba(124, 92, 252, 0.1), transparent 45%),
+    radial-gradient(circle at 85% 0%, rgba(79, 139, 255, 0.08), transparent 40%);
 }
 
 /* A hard height (not min-height) is what lets the canvas's flex-shrink
