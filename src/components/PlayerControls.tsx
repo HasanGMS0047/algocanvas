@@ -1,6 +1,8 @@
 import './PlayerControls.css'
 
-const SPEEDS = [0.5, 1, 1.5, 2, 4]
+const MIN_SPEED = 0.25
+const MAX_SPEED = 4
+const SPEED_STEP = 0.25
 
 interface PlayerControlsProps {
   index: number
@@ -57,13 +59,19 @@ export function PlayerControls({
         {index + 1} / {frameCount}
       </span>
 
-      <select value={speed} onChange={(e) => onSpeedChange(Number(e.target.value))}>
-        {SPEEDS.map((s) => (
-          <option key={s} value={s}>
-            {s}x
-          </option>
-        ))}
-      </select>
+      <div className="player-speed">
+        <input
+          type="range"
+          min={MIN_SPEED}
+          max={MAX_SPEED}
+          step={SPEED_STEP}
+          value={speed}
+          onChange={(e) => onSpeedChange(Number(e.target.value))}
+          className="player-speed-slider"
+          aria-label="Playback speed"
+        />
+        <span className="player-speed-label">{speed.toFixed(2)}x</span>
+      </div>
     </div>
   )
 }

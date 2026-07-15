@@ -5,7 +5,7 @@ interface UsePlayerOptions {
   msPerFrame?: number
 }
 
-export function usePlayer({ frameCount, msPerFrame = 800 }: UsePlayerOptions) {
+export function usePlayer({ frameCount, msPerFrame = 900 }: UsePlayerOptions) {
   const [index, setIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)

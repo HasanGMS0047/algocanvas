@@ -17,7 +17,7 @@ interface VisualizerProps<T> {
 }
 
 export function Visualizer<T>({ frames, render, predictor, explainer, algorithmId = '' }: VisualizerProps<T>) {
-  const player = usePlayer({ frameCount: frames.length, msPerFrame: 500 })
+  const player = usePlayer({ frameCount: frames.length, msPerFrame: 900 })
   const [predictModeEnabled, setPredictModeEnabled] = useState(false)
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
   const [explainModeEnabled, setExplainModeEnabled] = useState(true)
