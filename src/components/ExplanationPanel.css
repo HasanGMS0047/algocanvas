@@ -1,0 +1,28 @@
+.explanation-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin: 0 20px 16px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.explanation-toggle input {
+  accent-color: var(--color-accent-blue);
+}
+
+.explanation-panel {
+  flex: 0 0 auto;
+  padding: 14px 20px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.explanation-panel p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.5;
+}

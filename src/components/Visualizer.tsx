@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
+import type { Explainer } from '../explain/types'
 import { usePlayer } from '../player/usePlayer'
 import { useKeyboardShortcuts } from '../player/useKeyboardShortcuts'
 import type { Predictor } from '../predict/types'
 import { AlgoCanvas } from './AlgoCanvas'
+import { ExplanationPanel, ExplanationToggle } from './ExplanationPanel'
 import { PlayerControls } from './PlayerControls'
 import { PredictionPanel, PredictionToggle } from './PredictionPanel'
 
@@ -10,12 +12,15 @@ interface VisualizerProps<T> {
   frames: T[]
   render: (ctx: CanvasRenderingContext2D, width: number, height: number, frame: T) => void
   predictor?: Predictor<T>
+  explainer?: Explainer<T>
+  algorithmId?: string
 }
 
-export function Visualizer<T>({ frames, render, predictor }: VisualizerProps<T>) {
+export function Visualizer<T>({ frames, render, predictor, explainer, algorithmId = '' }: VisualizerProps<T>) {
   const player = usePlayer({ frameCount: frames.length, msPerFrame: 500 })
   const [predictModeEnabled, setPredictModeEnabled] = useState(false)
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
+  const [explainModeEnabled, setExplainModeEnabled] = useState(true)
 
   useKeyboardShortcuts({
     onPlayPause: () => (player.isPlaying ? player.pause() : player.play()),
@@ -49,6 +54,7 @@ export function Visualizer<T>({ frames, render, predictor }: VisualizerProps<T>)
   return (
     <>
       {predictor && <PredictionToggle enabled={predictModeEnabled} onChange={setPredictModeEnabled} />}
+      {explainer && <ExplanationToggle enabled={explainModeEnabled} onChange={setExplainModeEnabled} />}
       <AlgoCanvas draw={draw} />
       {prediction && (
         <PredictionPanel
@@ -57,6 +63,9 @@ export function Visualizer<T>({ frames, render, predictor }: VisualizerProps<T>)
           onSelect={setSelectedOptionId}
           onContinue={player.stepForward}
         />
+      )}
+      {explainer && explainModeEnabled && (
+        <ExplanationPanel text={explainer(frames[player.index], algorithmId)} />
       )}
       <PlayerControls
         index={player.index}

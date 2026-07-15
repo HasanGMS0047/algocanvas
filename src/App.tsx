@@ -26,6 +26,15 @@ import { GraphInput } from './components/GraphInput'
 import { TargetInput } from './components/TargetInput'
 import { Visualizer } from './components/Visualizer'
 import { WordListInput } from './components/WordListInput'
+import { explainBTreeStep } from './explain/btreeExplainer'
+import { explainDistributionStep } from './explain/distributionExplainer'
+import { explainGraphStep } from './explain/graphExplainer'
+import { explainHashTableStep } from './explain/hashTableExplainer'
+import { explainLisStep } from './explain/lisExplainer'
+import { explainSearchStep } from './explain/searchExplainer'
+import { explainSortStep } from './explain/sortExplainer'
+import { explainTreeStep } from './explain/treeExplainer'
+import { explainTrieStep } from './explain/trieExplainer'
 import { avlPredictor } from './predict/avlPredictor'
 import { quickSortPredictor } from './predict/quickSortPredictor'
 import { renderArrayFrame } from './render/renderArray'
@@ -225,23 +234,83 @@ function App() {
           frames={sort.frames}
           render={sort.render}
           predictor={algorithmId === 'quick' ? quickSortPredictor : undefined}
+          explainer={explainSortStep}
+          algorithmId={algorithmId}
         />
       )}
-      {dist && <Visualizer key={algorithmId} frames={dist.frames} render={dist.render} />}
-      {search && <Visualizer key={algorithmId} frames={search.frames} render={search.render} />}
-      {lis && <Visualizer key={algorithmId} frames={lis.frames} render={lis.render} />}
-      {graph && <Visualizer key={algorithmId} frames={graph.frames} render={graph.render} />}
+      {dist && (
+        <Visualizer
+          key={algorithmId}
+          frames={dist.frames}
+          render={dist.render}
+          explainer={explainDistributionStep}
+          algorithmId={algorithmId}
+        />
+      )}
+      {search && (
+        <Visualizer
+          key={algorithmId}
+          frames={search.frames}
+          render={search.render}
+          explainer={explainSearchStep}
+          algorithmId={algorithmId}
+        />
+      )}
+      {lis && (
+        <Visualizer
+          key={algorithmId}
+          frames={lis.frames}
+          render={lis.render}
+          explainer={explainLisStep}
+          algorithmId={algorithmId}
+        />
+      )}
+      {graph && (
+        <Visualizer
+          key={algorithmId}
+          frames={graph.frames}
+          render={graph.render}
+          explainer={explainGraphStep}
+          algorithmId={algorithmId}
+        />
+      )}
       {tree && (
         <Visualizer
           key={algorithmId}
           frames={tree.frames}
           render={tree.render}
           predictor={algorithmId === 'avl' ? avlPredictor : undefined}
+          explainer={explainTreeStep}
+          algorithmId={algorithmId}
         />
       )}
-      {bTree && <Visualizer key={algorithmId} frames={bTree.frames} render={bTree.render} />}
-      {trie && <Visualizer key={algorithmId} frames={trie.frames} render={trie.render} />}
-      {hashTable && <Visualizer key={algorithmId} frames={hashTable.frames} render={hashTable.render} />}
+      {bTree && (
+        <Visualizer
+          key={algorithmId}
+          frames={bTree.frames}
+          render={bTree.render}
+          explainer={explainBTreeStep}
+          algorithmId={algorithmId}
+        />
+      )}
+      {trie && (
+        <Visualizer
+          key={algorithmId}
+          frames={trie.frames}
+          render={trie.render}
+          explainer={explainTrieStep}
+          algorithmId={algorithmId}
+        />
+      )}
+      {hashTable && (
+        <Visualizer
+          key={algorithmId}
+          frames={hashTable.frames}
+          render={hashTable.render}
+          explainer={explainHashTableStep}
+          algorithmId={algorithmId}
+        />
+      )}
     </div>
   )
 }
