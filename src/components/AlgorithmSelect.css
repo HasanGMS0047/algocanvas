@@ -10,14 +10,14 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
-    border-color 100ms ease,
-    box-shadow 100ms ease,
-    transform 100ms ease;
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .algorithm-select:hover,
 .algorithm-select:focus-visible {
-  border-color: var(--color-text);
+  border-color: var(--color-accent-blue);
   box-shadow: 4px 4px 0 0 var(--color-accent-blue);
   transform: translate(-4px, -4px);
   outline: none;

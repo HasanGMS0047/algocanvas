@@ -19,13 +19,13 @@
   padding: 6px 12px;
   cursor: pointer;
   transition:
-    border-color 100ms ease,
-    box-shadow 100ms ease,
-    transform 100ms ease;
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .player-controls button:hover:not(:disabled) {
-  border-color: var(--color-text);
+  border-color: var(--color-accent-blue);
   box-shadow: 4px 4px 0 0 var(--color-accent-blue);
   transform: translate(-4px, -4px);
 }
