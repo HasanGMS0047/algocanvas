@@ -16,7 +16,8 @@ import { recordHashTableFrames } from './algorithms/hashtable/recordHashTableFra
 import { recordFrames } from './algorithms/recordFrames'
 import { SEARCH_ALGORITHMS } from './algorithms/search'
 import { recordSearchFrames } from './algorithms/search/recordSearchFrames'
-import { TREE_ALGORITHMS } from './algorithms/tree'
+import { BINARY_TREE_ALGORITHMS, TREE_ALGORITHMS } from './algorithms/tree'
+import { parseTreeShape, treeShapeToText } from './algorithms/tree/parseTreeShape'
 import { recordTreeFrames } from './algorithms/tree/recordTreeFrames'
 import { TRIE_ALGORITHMS } from './algorithms/trie'
 import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
@@ -24,6 +25,7 @@ import { AppHeader } from './components/AppHeader'
 import { ArrayInput } from './components/ArrayInput'
 import { GraphInput } from './components/GraphInput'
 import { TargetInput } from './components/TargetInput'
+import { TreeShapeInput } from './components/TreeShapeInput'
 import { Visualizer } from './components/Visualizer'
 import { WordListInput } from './components/WordListInput'
 import { explainBTreeStep } from './explain/btreeExplainer'
@@ -57,6 +59,7 @@ const ALL_ALGORITHMS = [
   ...DISTRIBUTION_ALGORITHMS,
   ...SEARCH_ALGORITHMS,
   ...GRAPH_ALGORITHMS,
+  ...BINARY_TREE_ALGORITHMS,
   ...TREE_ALGORITHMS,
   ...BTREE_ALGORITHMS,
   ...TRIE_ALGORITHMS,
@@ -74,6 +77,8 @@ const TRIE_IDS = new Set(TRIE_ALGORITHMS.map((a) => a.id))
 const DEFAULT_TRIE_WORDS = TRIE_ALGORITHMS[0].defaultWords
 const GRAPH_IDS = new Set(GRAPH_ALGORITHMS.map((a) => a.id))
 const DEFAULT_GRAPH_TEXT = graphToText(DEMO_GRAPH)
+const BINARY_TREE_IDS = new Set(BINARY_TREE_ALGORITHMS.map((a) => a.id))
+const DEFAULT_TREE_SHAPE_TEXT = treeShapeToText(BINARY_TREE_ALGORITHMS[0].defaultShape)
 
 function App() {
   const [algorithmId, setAlgorithmId] = useState(ALL_ALGORITHMS[0].id)
@@ -83,6 +88,7 @@ function App() {
   const [customGraphText, setCustomGraphText] = useState<string | null>(null)
   const [customStartNode, setCustomStartNode] = useState<string | null>(null)
   const [customTarget, setCustomTarget] = useState<number | null>(null)
+  const [customTreeShapeText, setCustomTreeShapeText] = useState<string | null>(null)
 
   const validation = useMemo(() => validateArray(customArray, algorithmId), [customArray, algorithmId])
   const effectiveArray = validation.valid ? customArray : DEFAULT_ARRAY
@@ -173,6 +179,20 @@ function App() {
     renderTreeFrame,
     [effectiveTreeSequence],
   )
+
+  const treeShapeParse = useMemo(
+    () => (customTreeShapeText !== null ? parseTreeShape(customTreeShapeText) : null),
+    [customTreeShapeText],
+  )
+  const effectiveTreeShape = treeShapeParse?.shape ?? BINARY_TREE_ALGORITHMS[0].defaultShape
+
+  const binaryTreeKind = useAlgorithmKind(
+    algorithmId,
+    BINARY_TREE_ALGORITHMS,
+    (a) => recordTreeFrames(() => a.run(effectiveTreeShape)),
+    renderTreeFrame,
+    [effectiveTreeShape],
+  )
   const bTree = useAlgorithmKind(
     algorithmId,
     BTREE_ALGORITHMS,
@@ -204,6 +224,13 @@ function App() {
         <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />
       )}
       {SEARCH_IDS.has(algorithmId) && <TargetInput value={effectiveTarget} onChange={setCustomTarget} />}
+      {BINARY_TREE_IDS.has(algorithmId) && (
+        <TreeShapeInput
+          value={customTreeShapeText ?? DEFAULT_TREE_SHAPE_TEXT}
+          onChange={setCustomTreeShapeText}
+          error={treeShapeParse?.error}
+        />
+      )}
       {treeDefault && (
         <ArrayInput
           value={customTreeSequence ?? treeDefault}
@@ -280,6 +307,15 @@ function App() {
           frames={tree.frames}
           render={tree.render}
           predictor={algorithmId === 'avl' ? avlPredictor : undefined}
+          explainer={explainTreeStep}
+          algorithmId={algorithmId}
+        />
+      )}
+      {binaryTreeKind && (
+        <Visualizer
+          key={algorithmId}
+          frames={binaryTreeKind.frames}
+          render={binaryTreeKind.render}
           explainer={explainTreeStep}
           algorithmId={algorithmId}
         />

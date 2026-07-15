@@ -9,18 +9,16 @@ export const DEMO_TREE: TreeNodeSpec = {
   right: { value: 3 },
 }
 
-// Takes an (ignored) sequence parameter purely so its `run` signature
-// matches the other tree algorithms in the registry - this one always
-// demonstrates the same hand-picked DEMO_TREE, since the whole point is a
-// specific curated shape (full + complete but not perfect), not something
-// a generic insert sequence should be able to override.
-export function* binaryTree(_insertSequence?: number[]): Generator<TreeStep> {
-  yield* insertLevelOrder(DEMO_TREE)
+// Unlike BST/AVL/RB, there's no insertion rule here (nothing to compare
+// against), so a custom shape is a full tree structure - typically parsed
+// from level-order text via parseTreeShape - rather than an insert sequence.
+export function* binaryTree(customShape: TreeNodeSpec = DEMO_TREE): Generator<TreeStep> {
+  yield* insertLevelOrder(customShape)
   yield {
     type: 'classify',
-    full: isFull(DEMO_TREE),
-    complete: isComplete(DEMO_TREE),
-    perfect: isPerfect(DEMO_TREE),
+    full: isFull(customShape),
+    complete: isComplete(customShape),
+    perfect: isPerfect(customShape),
   }
   yield { type: 'done' }
 }
