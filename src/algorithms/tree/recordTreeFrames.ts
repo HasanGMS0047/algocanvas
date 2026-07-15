@@ -7,13 +7,15 @@ export function recordTreeFrames(run: () => Generator<TreeStep>): TreeFrame[] {
 
   for (const step of run()) {
     if (step.type === 'insert') {
-      root = insertNode(root, step.value, step.parentValue, step.side)
+      root = insertNode(root, step.value, step.parentValue, step.side, step.color)
     } else if (step.type === 'replace') {
       root = replaceValue(root, step.value, step.withValue)
     } else if (step.type === 'remove') {
       root = removeNode(root, step.parentValue, step.side)
     } else if (step.type === 'rotate') {
       root = rotateNode(root, step.direction, step.parentValue, step.side)
+    } else if (step.type === 'recolor') {
+      root = recolorNode(root, step.value, step.color)
     } else if (step.type === 'classify') {
       classification = { full: step.full, complete: step.complete, perfect: step.perfect }
     }
@@ -28,14 +30,22 @@ function insertNode(
   value: number,
   parentValue: number | null,
   side: 'left' | 'right' | null,
+  color?: TreeNodeSpec['color'],
 ): TreeNodeSpec {
-  const newNode: TreeNodeSpec = { value }
+  const newNode: TreeNodeSpec = color ? { value, color } : { value }
   if (parentValue === null || !root) return newNode
 
   const next = cloneTree(root)!
   const parent = findByValue(next, parentValue)!
   if (side === 'left') parent.left = newNode
   else parent.right = newNode
+  return next
+}
+
+function recolorNode(root: TreeNodeSpec | null, value: number, color: TreeNodeSpec['color']): TreeNodeSpec | null {
+  const next = cloneTree(root)
+  const node = next && findByValue(next, value)
+  if (node) node.color = color
   return next
 }
 
@@ -110,7 +120,7 @@ function findByValue(node: TreeNodeSpec | null | undefined, value: number): Tree
 
 function cloneTree(node: TreeNodeSpec | null): TreeNodeSpec | null {
   if (!node) return null
-  const clone: TreeNodeSpec = { value: node.value }
+  const clone: TreeNodeSpec = node.color ? { value: node.value, color: node.color } : { value: node.value }
   if (node.left) clone.left = cloneTree(node.left) ?? undefined
   if (node.right) clone.right = cloneTree(node.right) ?? undefined
   return clone
