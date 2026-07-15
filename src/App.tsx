@@ -47,10 +47,7 @@ function App() {
     () => (distAlgorithm ? recordDistributionFrames(distAlgorithm.demoArray, distAlgorithm.bucketCount, distAlgorithm.run) : null),
     [distAlgorithm],
   )
-  const treeFrames = useMemo(
-    () => (treeAlgorithm ? recordTreeFrames(treeAlgorithm.demoTree, treeAlgorithm.run) : null),
-    [treeAlgorithm],
-  )
+  const treeFrames = useMemo(() => (treeAlgorithm ? recordTreeFrames(treeAlgorithm.run) : null), [treeAlgorithm])
 
   return (
     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>

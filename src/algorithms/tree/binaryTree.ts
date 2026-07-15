@@ -9,13 +9,13 @@ export const DEMO_TREE: TreeNodeSpec = {
   right: { value: 3 },
 }
 
-export function* binaryTree(spec: TreeNodeSpec): Generator<TreeStep> {
-  yield* insertLevelOrder(spec)
+export function* binaryTree(): Generator<TreeStep> {
+  yield* insertLevelOrder(DEMO_TREE)
   yield {
     type: 'classify',
-    full: isFull(spec),
-    complete: isComplete(spec),
-    perfect: isPerfect(spec),
+    full: isFull(DEMO_TREE),
+    complete: isComplete(DEMO_TREE),
+    perfect: isPerfect(DEMO_TREE),
   }
   yield { type: 'done' }
 }
