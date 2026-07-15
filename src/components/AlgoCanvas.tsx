@@ -9,13 +9,20 @@ interface AlgoCanvasProps {
 export function AlgoCanvas({ draw }: AlgoCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sizeRef = useRef({ width: 0, height: 0 })
+  // The ResizeObserver callback below is created once at mount (empty deps,
+  // so it never picks up a new `draw` closure) but can fire at any later
+  // render when the canvas's own box size changes - e.g. a sibling panel
+  // appearing shrinks it. Reading through a ref keeps that stale closure
+  // pointed at the current draw function instead of the mount-time one.
+  const drawRef = useRef(draw)
+  drawRef.current = draw
 
   const redraw = () => {
     const ctx = canvasRef.current?.getContext('2d')
     if (!ctx) return
     const { width, height } = sizeRef.current
     ctx.clearRect(0, 0, width, height)
-    draw?.(ctx, width, height)
+    drawRef.current?.(ctx, width, height)
   }
 
   useEffect(() => {

@@ -13,6 +13,8 @@ import { TRIE_ALGORITHMS } from './algorithms/trie'
 import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
 import { AlgorithmSelect } from './components/AlgorithmSelect'
 import { Visualizer } from './components/Visualizer'
+import { avlPredictor } from './predict/avlPredictor'
+import { quickSortPredictor } from './predict/quickSortPredictor'
 import { renderArrayFrame } from './render/renderArray'
 import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
@@ -59,9 +61,23 @@ function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <AlgorithmSelect algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
-      {sort && <Visualizer key={algorithmId} frames={sort.frames} render={sort.render} />}
+      {sort && (
+        <Visualizer
+          key={algorithmId}
+          frames={sort.frames}
+          render={sort.render}
+          predictor={algorithmId === 'quick' ? quickSortPredictor : undefined}
+        />
+      )}
       {dist && <Visualizer key={algorithmId} frames={dist.frames} render={dist.render} />}
-      {tree && <Visualizer key={algorithmId} frames={tree.frames} render={tree.render} />}
+      {tree && (
+        <Visualizer
+          key={algorithmId}
+          frames={tree.frames}
+          render={tree.render}
+          predictor={algorithmId === 'avl' ? avlPredictor : undefined}
+        />
+      )}
       {bTree && <Visualizer key={algorithmId} frames={bTree.frames} render={bTree.render} />}
       {trie && <Visualizer key={algorithmId} frames={trie.frames} render={trie.render} />}
       {hashTable && <Visualizer key={algorithmId} frames={hashTable.frames} render={hashTable.render} />}
