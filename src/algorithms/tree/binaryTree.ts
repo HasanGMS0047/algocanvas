@@ -37,7 +37,7 @@ function* insertLevelOrder(spec: TreeNodeSpec): Generator<TreeStep> {
   }
 }
 
-function isFull(node: TreeNodeSpec | null): boolean {
+export function isFull(node: TreeNodeSpec | null): boolean {
   if (!node) return true
   const hasLeft = Boolean(node.left)
   const hasRight = Boolean(node.right)
@@ -50,7 +50,7 @@ function height(node: TreeNodeSpec | null): number {
   return 1 + Math.max(height(node.left ?? null), height(node.right ?? null))
 }
 
-function isPerfect(node: TreeNodeSpec | null): boolean {
+export function isPerfect(node: TreeNodeSpec | null): boolean {
   const deepestLevel = height(node) - 1
 
   function check(n: TreeNodeSpec | null, level: number): boolean {
@@ -63,7 +63,7 @@ function isPerfect(node: TreeNodeSpec | null): boolean {
   return check(node, 0)
 }
 
-function isComplete(root: TreeNodeSpec | null): boolean {
+export function isComplete(root: TreeNodeSpec | null): boolean {
   const queue: Array<TreeNodeSpec | null> = [root]
   let seenGap = false
 
