@@ -42,13 +42,13 @@
   background: var(--color-panel);
   cursor: pointer;
   transition:
-    border-color 100ms ease,
-    box-shadow 100ms ease,
-    transform 100ms ease;
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .prediction-option:hover:not(:disabled) {
-  border-color: var(--color-text);
+  border-color: var(--color-accent-purple);
   box-shadow: 4px 4px 0 0 var(--color-accent-purple);
   transform: translate(-4px, -4px);
 }
@@ -90,13 +90,13 @@
   background: var(--color-panel);
   cursor: pointer;
   transition:
-    border-color 100ms ease,
-    box-shadow 100ms ease,
-    transform 100ms ease;
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .prediction-feedback button:hover {
-  border-color: var(--color-text);
+  border-color: var(--color-accent-blue);
   box-shadow: 4px 4px 0 0 var(--color-accent-blue);
   transform: translate(-4px, -4px);
 }

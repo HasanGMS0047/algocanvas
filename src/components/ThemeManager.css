@@ -14,14 +14,14 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
-    border-color 100ms ease,
-    box-shadow 100ms ease,
-    transform 100ms ease;
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .theme-manager-trigger:hover,
 .theme-manager-trigger[aria-expanded='true'] {
-  border-color: var(--color-text);
+  border-color: var(--color-accent-blue);
   box-shadow: 4px 4px 0 0 var(--color-accent-blue);
   transform: translate(-4px, -4px);
 }
@@ -43,7 +43,7 @@
   max-width: 90vw;
   padding: 16px;
   background: var(--color-panel);
-  border: 2px solid var(--color-text);
+  border: 2px solid var(--color-accent-blue);
   border-radius: var(--radius);
   box-shadow: 6px 6px 0 0 var(--color-accent-blue);
   display: flex;
@@ -70,19 +70,19 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition:
-    border-color 100ms ease,
-    box-shadow 100ms ease,
-    transform 100ms ease;
+    border-color 220ms ease-out,
+    box-shadow 220ms ease-out,
+    transform 220ms ease-out;
 }
 
 .theme-preset-option:hover {
-  border-color: var(--color-text);
+  border-color: var(--color-accent-blue);
   box-shadow: 3px 3px 0 0 var(--color-accent-blue);
   transform: translate(-3px, -3px);
 }
 
 .theme-preset-option.active {
-  border-color: var(--color-text);
+  border-color: var(--color-accent-blue);
   box-shadow: 3px 3px 0 0 var(--color-accent-blue);
 }
 
@@ -143,7 +143,7 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   width: 100%;
-  transition: border-color 100ms ease;
+  transition: border-color 220ms ease-out;
 }
 
 .theme-reset-button:hover {
