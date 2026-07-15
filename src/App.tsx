@@ -96,7 +96,7 @@ function App() {
   )
 
   return (
-    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <AlgorithmSelect algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
       {sortFrames && <Visualizer key={algorithmId} frames={sortFrames} render={sortRender} />}
       {distFrames && <Visualizer key={algorithmId} frames={distFrames} render={distRender} />}

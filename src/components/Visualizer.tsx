@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { usePlayer } from '../player/usePlayer'
+import { useKeyboardShortcuts } from '../player/useKeyboardShortcuts'
 import { AlgoCanvas } from './AlgoCanvas'
 import { PlayerControls } from './PlayerControls'
 
@@ -10,6 +11,14 @@ interface VisualizerProps<T> {
 
 export function Visualizer<T>({ frames, render }: VisualizerProps<T>) {
   const player = usePlayer({ frameCount: frames.length, msPerFrame: 500 })
+
+  useKeyboardShortcuts({
+    onPlayPause: () => (player.isPlaying ? player.pause() : player.play()),
+    onStepForward: player.stepForward,
+    onStepBack: player.stepBack,
+    onReset: player.reset,
+    onJumpToEnd: () => player.seek(frames.length - 1),
+  })
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, width: number, height: number) => {

@@ -1,7 +1,9 @@
 .algorithm-select {
-  position: absolute;
-  top: 16px;
-  left: 16px;
+  flex: 0 0 auto;
+  align-self: flex-start;
+  margin: 16px;
   font: inherit;
   padding: 6px 10px;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
 }
