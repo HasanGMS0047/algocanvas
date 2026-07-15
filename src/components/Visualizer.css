@@ -1,0 +1,18 @@
+.visualizer-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 20px;
+  margin: 0 20px 16px;
+}
+
+.visualizer-toggles .predict-toggle,
+.visualizer-toggles .explanation-toggle {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .visualizer-toggles {
+    margin: 0 16px 12px;
+  }
+}

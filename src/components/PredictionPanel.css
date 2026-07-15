@@ -101,3 +101,9 @@
 .prediction-feedback button:active {
   transform: scale(0.96);
 }
+
+@media (max-width: 640px) {
+  .prediction-panel {
+    padding: 10px 16px;
+  }
+}

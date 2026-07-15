@@ -56,3 +56,14 @@
   color: var(--color-danger);
   font-size: 13px;
 }
+
+@media (max-width: 640px) {
+  .array-input {
+    padding: 8px 16px;
+  }
+
+  .array-input-field {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}

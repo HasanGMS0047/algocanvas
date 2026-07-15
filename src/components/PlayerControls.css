@@ -68,3 +68,18 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-text-muted);
 }
+
+@media (max-width: 640px) {
+  .player-controls {
+    padding: 10px 16px;
+    gap: 8px 10px;
+  }
+
+  .player-scrub {
+    flex-basis: 100%;
+  }
+
+  .player-speed-slider {
+    width: 70px;
+  }
+}

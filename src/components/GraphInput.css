@@ -92,3 +92,24 @@
   font-size: 13px;
   max-width: 220px;
 }
+
+@media (max-width: 640px) {
+  .graph-input {
+    padding: 8px 16px;
+  }
+
+  .graph-input-field {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .graph-input-side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .graph-input-error {
+    max-width: 100%;
+  }
+}
