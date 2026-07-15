@@ -33,9 +33,12 @@ export function renderGraphFrame(
       activeEdge !== null &&
       ((activeEdge.from === edge.from && activeEdge.to === edge.to) ||
         (activeEdge.from === edge.to && activeEdge.to === edge.from))
+    const isMstEdge = frame.mstEdges.some(
+      (e) => (e.from === edge.from && e.to === edge.to) || (e.from === edge.to && e.to === edge.from),
+    )
 
-    ctx.strokeStyle = isActive ? PALETTE.compare : PALETTE.edge
-    ctx.lineWidth = isActive ? 2.5 : 1.5
+    ctx.strokeStyle = isActive ? PALETTE.compare : isMstEdge ? PALETTE.found : PALETTE.edge
+    ctx.lineWidth = isActive || isMstEdge ? 2.5 : 1.5
     ctx.beginPath()
     ctx.moveTo(px(from.x), py(from.y))
     ctx.lineTo(px(to.x), py(to.y))
@@ -90,6 +93,8 @@ function describeStep(step: GraphStep): string {
       return `explore edge ${step.from}–${step.to}`
     case 'relax':
       return `distance[${step.nodeId}] = ${step.distance}`
+    case 'acceptEdge':
+      return `add edge ${step.from}–${step.to} to MST`
     case 'done':
       return 'done'
   }

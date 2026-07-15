@@ -8,6 +8,7 @@ interface GraphInputProps {
   startNode: string
   onStartNodeChange: (id: string) => void
   nodeIds: string[]
+  showStartNode?: boolean
 }
 
 // Attaches each new node to a random earlier one (guaranteeing a connected
@@ -36,7 +37,15 @@ function randomGraphText(): string {
   return lines.join('\n')
 }
 
-export function GraphInput({ value, onChange, error, startNode, onStartNodeChange, nodeIds }: GraphInputProps) {
+export function GraphInput({
+  value,
+  onChange,
+  error,
+  startNode,
+  onStartNodeChange,
+  nodeIds,
+  showStartNode = true,
+}: GraphInputProps) {
   const [text, setText] = useState(value)
 
   useEffect(() => {
@@ -56,16 +65,18 @@ export function GraphInput({ value, onChange, error, startNode, onStartNodeChang
         placeholder="One edge per line: A-B or A-B:4"
       />
       <div className="graph-input-side">
-        <label className="graph-input-start">
-          Start node
-          <select value={startNode} onChange={(e) => onStartNodeChange(e.target.value)}>
-            {nodeIds.map((id) => (
-              <option key={id} value={id}>
-                {id}
-              </option>
-            ))}
-          </select>
-        </label>
+        {showStartNode && (
+          <label className="graph-input-start">
+            Start node
+            <select value={startNode} onChange={(e) => onStartNodeChange(e.target.value)}>
+              {nodeIds.map((id) => (
+                <option key={id} value={id}>
+                  {id}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <button type="button" onClick={() => onChange(randomGraphText())}>
           Randomize
         </button>
