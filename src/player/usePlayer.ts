@@ -10,8 +10,25 @@ export function usePlayer({ frameCount, msPerFrame = 900 }: UsePlayerOptions) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
 
-  const indexRef = useRef(index)
-  indexRef.current = index
+  const maxIndex = Math.max(frameCount - 1, 0)
+  // frameCount can shrink out from under an existing player instance - e.g.
+  // clicking "Randomize" on the input while stepped deep into a longer
+  // animation regenerates a shorter frames array without remounting
+  // Visualizer (only the algorithm switch remounts it, via its key). This
+  // has to be a derived value computed during render, not just corrected
+  // afterward in an effect - an effect runs too late to stop the *current*
+  // render from indexing frames[index] out of bounds and crashing.
+  const safeIndex = Math.min(index, maxIndex)
+
+  const indexRef = useRef(safeIndex)
+  indexRef.current = safeIndex
+
+  // Also sync the underlying state so subsequent renders/steps build on the
+  // corrected value instead of silently re-deriving it from a stale `index`.
+  useEffect(() => {
+    if (index > maxIndex) setIndex(maxIndex)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [maxIndex])
 
   useEffect(() => {
     if (!isPlaying) return
@@ -82,5 +99,5 @@ export function usePlayer({ frameCount, msPerFrame = 900 }: UsePlayerOptions) {
     setIndex(0)
   }, [])
 
-  return { index, isPlaying, speed, play, pause, stepForward, stepBack, seek, reset, setSpeed }
+  return { index: safeIndex, isPlaying, speed, play, pause, stepForward, stepBack, seek, reset, setSpeed }
 }
