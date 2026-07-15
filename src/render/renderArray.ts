@@ -7,7 +7,6 @@ const GAP = 4
 const LABEL_HEIGHT = 16
 
 interface RenderArrayOptions {
-  treeOverlay?: boolean
   showValues?: boolean
 }
 
@@ -30,20 +29,6 @@ export function renderArrayFrame(
   const barBottom = height - PADDING - (options.showValues ? LABEL_HEIGHT : 0)
   const usableHeight = barBottom - PADDING - 32
 
-  const centerX = (i: number) => PADDING + i * (barWidth + GAP) + barWidth / 2
-  const topY = (i: number) => barBottom - (array[i] / max) * usableHeight
-
-  if (options.treeOverlay) {
-    ctx.strokeStyle = PALETTE.edge
-    ctx.lineWidth = 1
-    for (let i = 0; i < n; i++) {
-      const left = 2 * i + 1
-      const right = 2 * i + 2
-      if (left < n) drawLine(ctx, centerX(i), topY(i), centerX(left), topY(left))
-      if (right < n) drawLine(ctx, centerX(i), topY(i), centerX(right), topY(right))
-    }
-  }
-
   for (let i = 0; i < n; i++) {
     const value = array[i]
     const barHeight = (value / max) * usableHeight
@@ -64,13 +49,6 @@ export function renderArrayFrame(
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText(describeStep(step), width / 2, PADDING / 2)
-}
-
-function drawLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number) {
-  ctx.beginPath()
-  ctx.moveTo(x1, y1)
-  ctx.lineTo(x2, y2)
-  ctx.stroke()
 }
 
 function describeStep(step: Frame['step']): string {
