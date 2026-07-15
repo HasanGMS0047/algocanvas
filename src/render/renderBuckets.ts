@@ -1,8 +1,6 @@
 import type { DistributionFrame, DistributionStep } from '../algorithms/distribution/types'
+import { PALETTE } from './palette'
 
-const COLOR_DEFAULT = '#3b82f6'
-const COLOR_ACTIVE = '#f59e0b'
-const COLOR_WRITE = '#10b981'
 const PADDING = 24
 const GAP = 6
 
@@ -10,8 +8,8 @@ export function renderBucketFrame(ctx: CanvasRenderingContext2D, width: number, 
   const { array, buckets, step } = frame
   const highlight = getHighlight(step)
 
-  ctx.fillStyle = '#888'
-  ctx.font = '16px system-ui, sans-serif'
+  ctx.fillStyle = PALETTE.textMuted
+  ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText(describeStep(step), width / 2, 4)
@@ -43,7 +41,7 @@ function drawArray(
     const x = PADDING + i * (barWidth + GAP)
     const y = areaHeight - barHeight
 
-    ctx.fillStyle = i === highlightIndex ? (isWrite ? COLOR_WRITE : COLOR_ACTIVE) : COLOR_DEFAULT
+    ctx.fillStyle = i === highlightIndex ? (isWrite ? PALETTE.found : PALETTE.compare) : PALETTE.default
     ctx.fillRect(x, y, barWidth, barHeight)
   }
 }
@@ -64,18 +62,18 @@ function drawBuckets(
     const x = PADDING + b * (colWidth + GAP)
     const isActive = b === activeBucket
 
-    ctx.strokeStyle = isActive ? COLOR_ACTIVE : 'rgba(128, 128, 128, 0.4)'
+    ctx.strokeStyle = isActive ? PALETTE.compare : PALETTE.edge
     ctx.lineWidth = isActive ? 2 : 1
     ctx.strokeRect(x, y0, colWidth, innerHeight)
 
-    ctx.fillStyle = '#888'
-    ctx.font = '12px system-ui, sans-serif'
+    ctx.fillStyle = PALETTE.textMuted
+    ctx.font = "12px 'Inter', system-ui, sans-serif"
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
     ctx.fillText(String(b), x + colWidth / 2, y0 + innerHeight + 4)
 
-    ctx.fillStyle = '#555'
-    ctx.font = '13px system-ui, sans-serif'
+    ctx.fillStyle = PALETTE.text
+    ctx.font = "13px 'Inter', system-ui, sans-serif"
     buckets[b].forEach((value, idx) => {
       ctx.fillText(String(value), x + colWidth / 2, y0 + 4 + idx * 16)
     })

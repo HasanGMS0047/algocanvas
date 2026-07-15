@@ -11,7 +11,7 @@ import { TREE_ALGORITHMS } from './algorithms/tree'
 import { recordTreeFrames } from './algorithms/tree/recordTreeFrames'
 import { TRIE_ALGORITHMS } from './algorithms/trie'
 import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
-import { AlgorithmSelect } from './components/AlgorithmSelect'
+import { AppHeader } from './components/AppHeader'
 import { Visualizer } from './components/Visualizer'
 import { avlPredictor } from './predict/avlPredictor'
 import { quickSortPredictor } from './predict/quickSortPredictor'
@@ -60,7 +60,7 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-      <AlgorithmSelect algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
+      <AppHeader algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
       {sort && (
         <Visualizer
           key={algorithmId}

@@ -1,4 +1,5 @@
 import type { BTreeFrame, BTreeNodeSpec, BTreeStep } from '../algorithms/btree/types'
+import { PALETTE } from './palette'
 
 const KEY_WIDTH = 32
 const KEY_HEIGHT = 30
@@ -6,11 +7,6 @@ const KEY_GAP = 2
 const LEVEL_GAP = 80
 const TOP_MARGIN = 56
 const SIDE_MARGIN = 40
-const COLOR_NODE = '#3b82f6'
-const COLOR_VISIT = '#f59e0b'
-const COLOR_INSERT = '#10b981'
-const COLOR_SPLIT = '#a855f7'
-const COLOR_EDGE = 'rgba(128, 128, 128, 0.5)'
 
 interface PositionedBNode {
   keys: number[]
@@ -21,8 +17,8 @@ interface PositionedBNode {
 }
 
 export function renderBTreeFrame(ctx: CanvasRenderingContext2D, width: number, _height: number, frame: BTreeFrame) {
-  ctx.fillStyle = '#888'
-  ctx.font = '16px system-ui, sans-serif'
+  ctx.fillStyle = PALETTE.textMuted
+  ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText(describeStep(frame.step), width / 2, 4)
@@ -39,7 +35,7 @@ export function renderBTreeFrame(ctx: CanvasRenderingContext2D, width: number, _
 
   const highlight = getHighlight(frame.step)
 
-  ctx.strokeStyle = COLOR_EDGE
+  ctx.strokeStyle = PALETTE.edge
   ctx.lineWidth = 1.5
   drawEdges(ctx, positioned, px, py)
   drawNode(ctx, positioned, px, py, highlight)
@@ -104,14 +100,14 @@ function drawNode(
     const kx = startX + i * (KEY_WIDTH + KEY_GAP)
     const keyHighlighted = nodeHighlighted && (highlight!.key === undefined || highlight!.key === node.keys[i])
 
-    ctx.fillStyle = keyHighlighted ? highlight!.color : COLOR_NODE
+    ctx.fillStyle = keyHighlighted ? highlight!.color : PALETTE.default
     ctx.fillRect(kx, cy - KEY_HEIGHT / 2, KEY_WIDTH, KEY_HEIGHT)
-    ctx.strokeStyle = '#fff'
+    ctx.strokeStyle = PALETTE.text
     ctx.lineWidth = 1
     ctx.strokeRect(kx, cy - KEY_HEIGHT / 2, KEY_WIDTH, KEY_HEIGHT)
 
-    ctx.fillStyle = '#fff'
-    ctx.font = '13px system-ui, sans-serif'
+    ctx.fillStyle = PALETTE.text
+    ctx.font = "13px 'Inter', system-ui, sans-serif"
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(String(node.keys[i]), kx + KEY_WIDTH / 2, cy + 1)
@@ -127,11 +123,11 @@ function pathsEqual(a: number[], b: number[]): boolean {
 function getHighlight(step: BTreeStep): { path: number[]; key?: number; color: string } | undefined {
   switch (step.type) {
     case 'visit':
-      return { path: step.path, color: COLOR_VISIT }
+      return { path: step.path, color: PALETTE.compare }
     case 'insertKey':
-      return { path: step.path, key: step.key, color: COLOR_INSERT }
+      return { path: step.path, key: step.key, color: PALETTE.found }
     case 'split':
-      return { path: step.path, color: COLOR_SPLIT }
+      return { path: step.path, color: PALETTE.structural }
     default:
       return undefined
   }

@@ -1,17 +1,13 @@
 import type { HashStep, HashTableFrame } from '../algorithms/hashtable/types'
+import { PALETTE } from './palette'
 
 const PADDING = 24
 const GAP = 8
 const BUCKET_AREA_Y = 48
-const COLOR_HASH = '#f59e0b'
-const COLOR_COMPARE = '#f59e0b'
-const COLOR_INSERT = '#10b981'
-const COLOR_FOUND = '#10b981'
-const COLOR_DELETE = '#ef4444'
 
 export function renderHashTableFrame(ctx: CanvasRenderingContext2D, width: number, height: number, frame: HashTableFrame) {
-  ctx.fillStyle = '#888'
-  ctx.font = '16px system-ui, sans-serif'
+  ctx.fillStyle = PALETTE.textMuted
+  ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText(describeStep(frame.step), width / 2, 4)
@@ -27,20 +23,20 @@ export function renderHashTableFrame(ctx: CanvasRenderingContext2D, width: numbe
     const x = PADDING + b * (colWidth + GAP)
     const isActive = highlight?.bucketIndex === b
 
-    ctx.strokeStyle = isActive ? highlight!.color : 'rgba(128, 128, 128, 0.4)'
+    ctx.strokeStyle = isActive ? highlight!.color : PALETTE.edge
     ctx.lineWidth = isActive ? 2 : 1
     ctx.strokeRect(x, BUCKET_AREA_Y, colWidth, bucketAreaHeight)
 
-    ctx.fillStyle = '#888'
-    ctx.font = '12px system-ui, sans-serif'
+    ctx.fillStyle = PALETTE.textMuted
+    ctx.font = "12px 'Inter', system-ui, sans-serif"
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
     ctx.fillText(String(b), x + colWidth / 2, BUCKET_AREA_Y + bucketAreaHeight + 4)
 
-    ctx.font = '13px system-ui, sans-serif'
+    ctx.font = "13px 'Inter', system-ui, sans-serif"
     buckets[b].forEach((key, idx) => {
       const keyHighlighted = isActive && highlight!.key === key
-      ctx.fillStyle = keyHighlighted ? highlight!.color : '#555'
+      ctx.fillStyle = keyHighlighted ? highlight!.color : PALETTE.text
       ctx.fillText(String(key), x + colWidth / 2, BUCKET_AREA_Y + 6 + idx * 18)
     })
   }
@@ -49,17 +45,17 @@ export function renderHashTableFrame(ctx: CanvasRenderingContext2D, width: numbe
 function getHighlight(step: HashStep): { bucketIndex: number; key?: number; color: string } | undefined {
   switch (step.type) {
     case 'hash':
-      return { bucketIndex: step.bucketIndex, color: COLOR_HASH }
+      return { bucketIndex: step.bucketIndex, color: PALETTE.compare }
     case 'insert':
-      return { bucketIndex: step.bucketIndex, key: step.key, color: COLOR_INSERT }
+      return { bucketIndex: step.bucketIndex, key: step.key, color: PALETTE.found }
     case 'compare':
-      return { bucketIndex: step.bucketIndex, key: step.key, color: COLOR_COMPARE }
+      return { bucketIndex: step.bucketIndex, key: step.key, color: PALETTE.compare }
     case 'found':
-      return { bucketIndex: step.bucketIndex, key: step.key, color: COLOR_FOUND }
+      return { bucketIndex: step.bucketIndex, key: step.key, color: PALETTE.found }
     case 'delete':
-      return { bucketIndex: step.bucketIndex, key: step.key, color: COLOR_DELETE }
+      return { bucketIndex: step.bucketIndex, key: step.key, color: PALETTE.swap }
     case 'notFound':
-      return { bucketIndex: step.bucketIndex, color: COLOR_COMPARE }
+      return { bucketIndex: step.bucketIndex, color: PALETTE.compare }
     default:
       return undefined
   }

@@ -1,5 +1,21 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
+
+  --color-bg: #09090b;
+  --color-bg-secondary: #111113;
+  --color-panel: #18181b;
+  --color-border: #27272a;
+  --color-text: #ffffff;
+  --color-text-muted: #a1a1aa;
+
+  --color-accent-blue: #4f8bff;
+  --color-accent-purple: #7c5cfc;
+  --color-accent-green: #32d583;
+  --color-accent-orange: #f79009;
+  --color-danger: #f04438;
+
+  --radius: 16px;
+  --radius-sm: 8px;
 }
 
 html,
@@ -11,6 +27,8 @@ body,
 }
 
 body {
-  font: 16px/1.5 system-ui, 'Segoe UI', Roboto, sans-serif;
+  font: 16px/1.5 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   overflow: hidden;
+  background: var(--color-bg);
+  color: var(--color-text);
 }

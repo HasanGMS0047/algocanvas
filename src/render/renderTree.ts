@@ -1,13 +1,8 @@
 import type { TreeFrame, TreeNodeSpec, TreeStep } from '../algorithms/tree/types'
+import { PALETTE } from './palette'
 
 const RADIUS = 18
-const COLOR_NODE = '#3b82f6'
-const COLOR_ACTIVE = '#f59e0b'
-const COLOR_FOUND = '#10b981'
-const COLOR_ROTATE = '#a855f7'
-const COLOR_RB_RED = '#ef4444'
-const COLOR_RB_BLACK = '#27272a'
-const COLOR_EDGE = 'rgba(128, 128, 128, 0.5)'
+const COLOR_RB_BLACK = '#3f3f46' // lighter than the page background so black nodes stay visible against it
 const TOP_MARGIN = 56
 const BOTTOM_MARGIN = 24
 const SIDE_MARGIN = 32
@@ -22,15 +17,15 @@ interface PositionedNode {
 }
 
 export function renderTreeFrame(ctx: CanvasRenderingContext2D, width: number, height: number, frame: TreeFrame) {
-  ctx.fillStyle = '#888'
-  ctx.font = '16px system-ui, sans-serif'
+  ctx.fillStyle = PALETTE.textMuted
+  ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText(describeStep(frame.step), width / 2, 4)
 
   if (frame.classification) {
     const { full, complete, perfect } = frame.classification
-    ctx.font = '14px system-ui, sans-serif'
+    ctx.font = "14px 'Inter', system-ui, sans-serif"
     ctx.fillText(
       `full: ${full ? 'yes' : 'no'}   complete: ${complete ? 'yes' : 'no'}   perfect: ${perfect ? 'yes' : 'no'}`,
       width / 2,
@@ -56,7 +51,7 @@ export function renderTreeFrame(ctx: CanvasRenderingContext2D, width: number, he
 
   const highlight = getHighlight(frame.step)
 
-  ctx.strokeStyle = COLOR_EDGE
+  ctx.strokeStyle = PALETTE.edge
   ctx.lineWidth = 1.5
   drawEdges(ctx, positioned, px, py)
   drawNodes(ctx, positioned, px, py, highlight)
@@ -96,8 +91,8 @@ function drawNodes(
   const x = px(node.x)
   const y = py(node.depth)
 
-  let fill: string = COLOR_NODE
-  if (node.color === 'red') fill = COLOR_RB_RED
+  let fill: string = PALETTE.default
+  if (node.color === 'red') fill = PALETTE.swap
   else if (node.color === 'black') fill = COLOR_RB_BLACK
   if (node.value === highlight?.value) fill = highlight.color
 
@@ -105,9 +100,12 @@ function drawNodes(
   ctx.beginPath()
   ctx.arc(x, y, RADIUS, 0, Math.PI * 2)
   ctx.fill()
+  ctx.strokeStyle = PALETTE.edge
+  ctx.lineWidth = 1
+  ctx.stroke()
 
-  ctx.fillStyle = '#fff'
-  ctx.font = '13px system-ui, sans-serif'
+  ctx.fillStyle = PALETTE.text
+  ctx.font = "13px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   ctx.fillText(String(node.value), x, y + 1)
@@ -126,15 +124,15 @@ function getMaxDepth(node: PositionedNode): number {
 function getHighlight(step: TreeStep): { value: number; color: string } | undefined {
   switch (step.type) {
     case 'insert':
-      return { value: step.value, color: COLOR_ACTIVE }
+      return { value: step.value, color: PALETTE.compare }
     case 'compare':
-      return { value: step.value, color: COLOR_ACTIVE }
+      return { value: step.value, color: PALETTE.compare }
     case 'found':
-      return { value: step.value, color: COLOR_FOUND }
+      return { value: step.value, color: PALETTE.found }
     case 'replace':
-      return { value: step.withValue, color: COLOR_ACTIVE }
+      return { value: step.withValue, color: PALETTE.compare }
     case 'rotate':
-      return { value: step.pivotValue, color: COLOR_ROTATE }
+      return { value: step.pivotValue, color: PALETTE.structural }
     default:
       return undefined
   }

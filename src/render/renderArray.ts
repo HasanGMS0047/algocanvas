@@ -1,10 +1,6 @@
 import type { Frame } from '../algorithms/recordFrames'
+import { PALETTE } from './palette'
 
-const COLOR_DEFAULT = '#3b82f6'
-const COLOR_COMPARE = '#f59e0b'
-const COLOR_SWAP = '#ef4444'
-const COLOR_OVERWRITE = '#10b981'
-const COLOR_TREE_EDGE = 'rgba(128, 128, 128, 0.35)'
 const PADDING = 24
 const GAP = 4
 
@@ -23,7 +19,7 @@ export function renderArrayFrame(
   const highlighted: number[] =
     step.type === 'compare' || step.type === 'swap' ? step.indices : step.type === 'overwrite' ? [step.index] : []
   const highlightColor =
-    step.type === 'swap' ? COLOR_SWAP : step.type === 'overwrite' ? COLOR_OVERWRITE : COLOR_COMPARE
+    step.type === 'swap' ? PALETTE.swap : step.type === 'overwrite' ? PALETTE.found : PALETTE.compare
 
   const n = array.length
   const barWidth = (width - PADDING * 2 - GAP * (n - 1)) / n
@@ -34,7 +30,7 @@ export function renderArrayFrame(
   const topY = (i: number) => height - PADDING - (array[i] / max) * usableHeight
 
   if (options.treeOverlay) {
-    ctx.strokeStyle = COLOR_TREE_EDGE
+    ctx.strokeStyle = PALETTE.edge
     ctx.lineWidth = 1
     for (let i = 0; i < n; i++) {
       const left = 2 * i + 1
@@ -50,12 +46,12 @@ export function renderArrayFrame(
     const x = PADDING + i * (barWidth + GAP)
     const y = height - PADDING - barHeight
 
-    ctx.fillStyle = highlighted.includes(i) ? highlightColor : COLOR_DEFAULT
+    ctx.fillStyle = highlighted.includes(i) ? highlightColor : PALETTE.default
     ctx.fillRect(x, y, barWidth, barHeight)
   }
 
-  ctx.fillStyle = '#888'
-  ctx.font = '16px system-ui, sans-serif'
+  ctx.fillStyle = PALETTE.textMuted
+  ctx.font = "16px 'Inter', system-ui, sans-serif"
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   ctx.fillText(describeStep(step), width / 2, PADDING / 2)
