@@ -6,6 +6,9 @@ import type { BTreeFrame } from './algorithms/btree/types'
 import { DISTRIBUTION_ALGORITHMS } from './algorithms/distribution'
 import { recordDistributionFrames } from './algorithms/distribution/recordDistributionFrames'
 import type { DistributionFrame } from './algorithms/distribution/types'
+import { HASHTABLE_ALGORITHMS } from './algorithms/hashtable'
+import { recordHashTableFrames } from './algorithms/hashtable/recordHashTableFrames'
+import type { HashTableFrame } from './algorithms/hashtable/types'
 import { recordFrames } from './algorithms/recordFrames'
 import type { Frame } from './algorithms/recordFrames'
 import { TREE_ALGORITHMS } from './algorithms/tree'
@@ -19,6 +22,7 @@ import { Visualizer } from './components/Visualizer'
 import { renderArrayFrame } from './render/renderArray'
 import { renderBTreeFrame } from './render/renderBTree'
 import { renderBucketFrame } from './render/renderBuckets'
+import { renderHashTableFrame } from './render/renderHashTable'
 import { renderTreeFrame } from './render/renderTree'
 import { renderTrieFrame } from './render/renderTrie'
 
@@ -29,6 +33,7 @@ const ALL_ALGORITHMS = [
   ...TREE_ALGORITHMS,
   ...BTREE_ALGORITHMS,
   ...TRIE_ALGORITHMS,
+  ...HASHTABLE_ALGORITHMS,
 ]
 
 function App() {
@@ -39,6 +44,7 @@ function App() {
   const treeAlgorithm = TREE_ALGORITHMS.find((a) => a.id === algorithmId)
   const bTreeAlgorithm = BTREE_ALGORITHMS.find((a) => a.id === algorithmId)
   const trieAlgorithm = TRIE_ALGORITHMS.find((a) => a.id === algorithmId)
+  const hashTableAlgorithm = HASHTABLE_ALGORITHMS.find((a) => a.id === algorithmId)
 
   const sortRender = useCallback(
     (ctx: CanvasRenderingContext2D, width: number, height: number, frame: Frame) => {
@@ -63,6 +69,13 @@ function App() {
     renderTrieFrame(ctx, width, height, frame)
   }, [])
 
+  const hashTableRender = useCallback(
+    (ctx: CanvasRenderingContext2D, width: number, height: number, frame: HashTableFrame) => {
+      renderHashTableFrame(ctx, width, height, frame)
+    },
+    [],
+  )
+
   const sortFrames = useMemo(
     () => (sortAlgorithm ? recordFrames(DEMO_ARRAY, sortAlgorithm.run) : null),
     [sortAlgorithm],
@@ -77,6 +90,10 @@ function App() {
     [bTreeAlgorithm],
   )
   const trieFrames = useMemo(() => (trieAlgorithm ? recordTrieFrames(trieAlgorithm.run) : null), [trieAlgorithm])
+  const hashTableFrames = useMemo(
+    () => (hashTableAlgorithm ? recordHashTableFrames(hashTableAlgorithm.bucketCount, hashTableAlgorithm.run) : null),
+    [hashTableAlgorithm],
+  )
 
   return (
     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
@@ -86,6 +103,7 @@ function App() {
       {treeFrames && <Visualizer key={algorithmId} frames={treeFrames} render={treeRender} />}
       {bTreeFrames && <Visualizer key={algorithmId} frames={bTreeFrames} render={bTreeRender} />}
       {trieFrames && <Visualizer key={algorithmId} frames={trieFrames} render={trieRender} />}
+      {hashTableFrames && <Visualizer key={algorithmId} frames={hashTableFrames} render={hashTableRender} />}
     </div>
   )
 }
