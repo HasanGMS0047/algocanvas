@@ -3,6 +3,7 @@ import type { TreeFrame, TreeNodeSpec, TreeStep } from '../algorithms/tree/types
 const RADIUS = 18
 const COLOR_NODE = '#3b82f6'
 const COLOR_ACTIVE = '#f59e0b'
+const COLOR_FOUND = '#10b981'
 const COLOR_EDGE = 'rgba(128, 128, 128, 0.5)'
 const TOP_MARGIN = 56
 const BOTTOM_MARGIN = 24
@@ -49,12 +50,12 @@ export function renderTreeFrame(ctx: CanvasRenderingContext2D, width: number, he
   const px = (x: number) => (nodeCount > 1 ? SIDE_MARGIN + x * slotGap : width / 2)
   const py = (d: number) => TOP_MARGIN + d * levelGap
 
-  const activeValue = getActiveValue(frame.step)
+  const highlight = getHighlight(frame.step)
 
   ctx.strokeStyle = COLOR_EDGE
   ctx.lineWidth = 1.5
   drawEdges(ctx, positioned, px, py)
-  drawNodes(ctx, positioned, px, py, activeValue)
+  drawNodes(ctx, positioned, px, py, highlight)
 }
 
 function layout(node: TreeNodeSpec | null, depth: number, counter: { n: number }): PositionedNode | undefined {
@@ -86,12 +87,12 @@ function drawNodes(
   node: PositionedNode,
   px: (x: number) => number,
   py: (d: number) => number,
-  activeValue: number | undefined,
+  highlight: { value: number; color: string } | undefined,
 ) {
   const x = px(node.x)
   const y = py(node.depth)
 
-  ctx.fillStyle = node.value === activeValue ? COLOR_ACTIVE : COLOR_NODE
+  ctx.fillStyle = node.value === highlight?.value ? highlight.color : COLOR_NODE
   ctx.beginPath()
   ctx.arc(x, y, RADIUS, 0, Math.PI * 2)
   ctx.fill()
@@ -102,8 +103,8 @@ function drawNodes(
   ctx.textBaseline = 'middle'
   ctx.fillText(String(node.value), x, y + 1)
 
-  if (node.left) drawNodes(ctx, node.left, px, py, activeValue)
-  if (node.right) drawNodes(ctx, node.right, px, py, activeValue)
+  if (node.left) drawNodes(ctx, node.left, px, py, highlight)
+  if (node.right) drawNodes(ctx, node.right, px, py, highlight)
 }
 
 function getMaxDepth(node: PositionedNode): number {
@@ -113,8 +114,19 @@ function getMaxDepth(node: PositionedNode): number {
   return max
 }
 
-function getActiveValue(step: TreeStep): number | undefined {
-  return step.type === 'insert' ? step.value : undefined
+function getHighlight(step: TreeStep): { value: number; color: string } | undefined {
+  switch (step.type) {
+    case 'insert':
+      return { value: step.value, color: COLOR_ACTIVE }
+    case 'compare':
+      return { value: step.value, color: COLOR_ACTIVE }
+    case 'found':
+      return { value: step.value, color: COLOR_FOUND }
+    case 'replace':
+      return { value: step.withValue, color: COLOR_ACTIVE }
+    default:
+      return undefined
+  }
 }
 
 function describeStep(step: TreeStep): string {
@@ -125,6 +137,16 @@ function describeStep(step: TreeStep): string {
       return step.parentValue === null
         ? `insert ${step.value} (root)`
         : `insert ${step.value} as ${step.side} child of ${step.parentValue}`
+    case 'compare':
+      return `compare ${step.value} vs ${step.target}`
+    case 'found':
+      return `found ${step.value}`
+    case 'notFound':
+      return `${step.target} not found`
+    case 'replace':
+      return `replace ${step.value} with ${step.withValue}`
+    case 'remove':
+      return `remove ${step.value}`
     case 'classify':
       return 'classify shape'
     case 'done':
