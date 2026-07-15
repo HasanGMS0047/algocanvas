@@ -1,8 +1,8 @@
 import { avlTree, DEFAULT_INSERT_SEQUENCE as AVL_DEFAULT_SEQUENCE } from './avl'
-import { binaryTree } from './binaryTree'
+import { binaryTree, DEMO_TREE } from './binaryTree'
 import { binarySearchTree, DEFAULT_INSERT_SEQUENCE as BST_DEFAULT_SEQUENCE } from './bst'
 import { DEFAULT_INSERT_SEQUENCE as RB_DEFAULT_SEQUENCE, redBlackTree } from './rb'
-import type { TreeStep } from './types'
+import type { TreeNodeSpec, TreeStep } from './types'
 
 const CATEGORY = 'Trees'
 
@@ -11,13 +11,25 @@ export interface TreeAlgorithm {
   name: string
   category: string
   run: (insertSequence?: number[]) => Generator<TreeStep>
-  // undefined = doesn't support custom input (Binary Tree always shows its
-  // one curated demo shape).
-  defaultSequence?: number[]
+  defaultSequence: number[]
 }
 
+// Binary Tree gets its own registry (not TreeAlgorithm) because it has no
+// insertion rule - its "custom input" is a full shape (see parseTreeShape),
+// not an insert sequence, so `run` takes a different parameter type.
+export interface BinaryTreeAlgorithm {
+  id: string
+  name: string
+  category: string
+  run: (shape?: TreeNodeSpec) => Generator<TreeStep>
+  defaultShape: TreeNodeSpec
+}
+
+export const BINARY_TREE_ALGORITHMS: BinaryTreeAlgorithm[] = [
+  { id: 'binary-tree', name: 'Binary Tree', category: CATEGORY, run: binaryTree, defaultShape: DEMO_TREE },
+]
+
 export const TREE_ALGORITHMS: TreeAlgorithm[] = [
-  { id: 'binary-tree', name: 'Binary Tree', category: CATEGORY, run: binaryTree },
   {
     id: 'bst',
     name: 'Binary Search Tree',
