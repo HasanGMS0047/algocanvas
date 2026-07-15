@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import './AlgoCanvas.css'
 
 type Draw = (ctx: CanvasRenderingContext2D, width: number, height: number) => void
 
@@ -49,5 +50,5 @@ export function AlgoCanvas({ draw }: AlgoCanvasProps) {
 
   useEffect(redraw)
 
-  return <canvas ref={canvasRef} style={{ display: 'block', width: '100%', flex: '1 1 auto', minHeight: '220px' }} />
+  return <canvas ref={canvasRef} className="algo-canvas" />
 }

@@ -1,0 +1,17 @@
+.algo-canvas {
+  display: block;
+  width: 100%;
+  flex: 1 1 auto;
+  /* On desktop, the canvas can shrink all the way down if it must - the
+     rest of the layout is sized so everything fits in one viewport with
+     no scrolling. Only below the mobile breakpoint (where several panels
+     stacking can genuinely exceed the viewport) does the canvas get a
+     real floor plus a scroll fallback - see index.css. */
+  min-height: 0;
+}
+
+@media (max-width: 640px) {
+  .algo-canvas {
+    min-height: 220px;
+  }
+}
