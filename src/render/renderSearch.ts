@@ -3,14 +3,26 @@ import { PALETTE } from './palette'
 
 const PADDING = 24
 const GAP = 4
+const LABEL_HEIGHT = 16
 const DIMMED = 'rgba(79, 139, 255, 0.18)'
 
-export function renderSearchFrame(ctx: CanvasRenderingContext2D, width: number, height: number, frame: SearchFrame) {
+interface RenderSearchOptions {
+  showValues?: boolean
+}
+
+export function renderSearchFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  frame: SearchFrame,
+  options: RenderSearchOptions = {},
+) {
   const { array, step, range, foundIndex } = frame
   const n = array.length
   const barWidth = (width - PADDING * 2 - GAP * (n - 1)) / n
   const max = Math.max(...array, 1)
-  const usableHeight = height - PADDING * 2 - 32
+  const barBottom = height - PADDING - (options.showValues ? LABEL_HEIGHT : 0)
+  const usableHeight = barBottom - PADDING - 32
 
   const activeProbe = step.type === 'probe' ? step.index : null
 
@@ -18,7 +30,7 @@ export function renderSearchFrame(ctx: CanvasRenderingContext2D, width: number, 
     const value = array[i]
     const barHeight = (value / max) * usableHeight
     const x = PADDING + i * (barWidth + GAP)
-    const y = height - PADDING - barHeight
+    const y = barBottom - barHeight
 
     const inRange = i >= range[0] && i <= range[1]
     ctx.fillStyle =
@@ -31,6 +43,14 @@ export function renderSearchFrame(ctx: CanvasRenderingContext2D, width: number, 
             : DIMMED
 
     ctx.fillRect(x, y, barWidth, barHeight)
+
+    if (options.showValues) {
+      ctx.fillStyle = PALETTE.text
+      ctx.font = "11px 'Inter', system-ui, sans-serif"
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'top'
+      ctx.fillText(String(value), x + barWidth / 2, barBottom + 2)
+    }
   }
 
   ctx.fillStyle = PALETTE.textMuted

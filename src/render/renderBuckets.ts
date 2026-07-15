@@ -3,8 +3,19 @@ import { PALETTE } from './palette'
 
 const PADDING = 24
 const GAP = 6
+const LABEL_HEIGHT = 16
 
-export function renderBucketFrame(ctx: CanvasRenderingContext2D, width: number, height: number, frame: DistributionFrame) {
+interface RenderBucketOptions {
+  showValues?: boolean
+}
+
+export function renderBucketFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  frame: DistributionFrame,
+  options: RenderBucketOptions = {},
+) {
   const { array, buckets, step } = frame
   const highlight = getHighlight(step)
 
@@ -15,7 +26,7 @@ export function renderBucketFrame(ctx: CanvasRenderingContext2D, width: number, 
   ctx.fillText(describeStep(step), width / 2, 4)
 
   const arrayAreaHeight = height * 0.5
-  drawArray(ctx, width, arrayAreaHeight, array, highlight.arrayIndex, step.type === 'write')
+  drawArray(ctx, width, arrayAreaHeight, array, highlight.arrayIndex, step.type === 'write', options.showValues)
 
   const bucketAreaY = arrayAreaHeight + 24
   const bucketAreaHeight = height - bucketAreaY - PADDING
@@ -29,20 +40,30 @@ function drawArray(
   array: number[],
   highlightIndex: number | undefined,
   isWrite: boolean,
+  showValues: boolean | undefined,
 ) {
   const n = array.length
   const barWidth = (width - PADDING * 2 - GAP * (n - 1)) / n
   const max = Math.max(...array)
-  const usableHeight = areaHeight - PADDING - 24
+  const barBottom = areaHeight - (showValues ? LABEL_HEIGHT : 0)
+  const usableHeight = barBottom - PADDING - 24
 
   for (let i = 0; i < n; i++) {
     const value = array[i]
     const barHeight = (value / max) * usableHeight
     const x = PADDING + i * (barWidth + GAP)
-    const y = areaHeight - barHeight
+    const y = barBottom - barHeight
 
     ctx.fillStyle = i === highlightIndex ? (isWrite ? PALETTE.found : PALETTE.compare) : PALETTE.default
     ctx.fillRect(x, y, barWidth, barHeight)
+
+    if (showValues) {
+      ctx.fillStyle = PALETTE.text
+      ctx.font = "11px 'Inter', system-ui, sans-serif"
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'top'
+      ctx.fillText(String(value), x + barWidth / 2, barBottom + 2)
+    }
   }
 }
 

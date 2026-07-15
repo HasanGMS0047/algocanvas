@@ -1,0 +1,14 @@
+.show-values-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 24px 10px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.show-values-toggle input {
+  accent-color: var(--color-accent-green);
+}

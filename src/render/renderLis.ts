@@ -5,7 +5,17 @@ const PADDING = 24
 const GAP = 4
 const LABEL_HEIGHT = 18
 
-export function renderLisFrame(ctx: CanvasRenderingContext2D, width: number, height: number, frame: LisFrame) {
+interface RenderLisOptions {
+  showValues?: boolean
+}
+
+export function renderLisFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  frame: LisFrame,
+  options: RenderLisOptions = {},
+) {
   const { array, step, dp, lisIndices } = frame
   const n = array.length
   const barWidth = (width - PADDING * 2 - GAP * (n - 1)) / n
@@ -31,6 +41,14 @@ export function renderLisFrame(ctx: CanvasRenderingContext2D, width: number, hei
           ? PALETTE.compare
           : PALETTE.default
     ctx.fillRect(x, y, barWidth, barHeight)
+
+    if (options.showValues) {
+      ctx.fillStyle = PALETTE.text
+      ctx.font = "11px 'Inter', system-ui, sans-serif"
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'bottom'
+      ctx.fillText(String(value), x + barWidth / 2, y - 2)
+    }
 
     ctx.fillStyle = PALETTE.textMuted
     ctx.font = "11px 'Inter', system-ui, sans-serif"
