@@ -13,6 +13,8 @@ export function recordFrames(input: number[], run: (arr: number[]) => Generator<
     if (step.type === 'swap') {
       const [a, b] = step.indices
       ;[array[a], array[b]] = [array[b], array[a]]
+    } else if (step.type === 'overwrite') {
+      array[step.index] = step.value
     }
     frames.push({ step, array: [...array] })
   }

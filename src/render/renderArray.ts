@@ -3,13 +3,16 @@ import type { Frame } from '../algorithms/recordFrames'
 const COLOR_DEFAULT = '#3b82f6'
 const COLOR_COMPARE = '#f59e0b'
 const COLOR_SWAP = '#ef4444'
+const COLOR_OVERWRITE = '#10b981'
 const PADDING = 24
 const GAP = 4
 
 export function renderArrayFrame(ctx: CanvasRenderingContext2D, width: number, height: number, frame: Frame) {
   const { array, step } = frame
-  const highlighted: number[] = step.type === 'compare' || step.type === 'swap' ? step.indices : []
-  const highlightColor = step.type === 'swap' ? COLOR_SWAP : COLOR_COMPARE
+  const highlighted: number[] =
+    step.type === 'compare' || step.type === 'swap' ? step.indices : step.type === 'overwrite' ? [step.index] : []
+  const highlightColor =
+    step.type === 'swap' ? COLOR_SWAP : step.type === 'overwrite' ? COLOR_OVERWRITE : COLOR_COMPARE
 
   const n = array.length
   const barWidth = (width - PADDING * 2 - GAP * (n - 1)) / n
@@ -41,6 +44,8 @@ function describeStep(step: Frame['step']): string {
       return `compare(${step.indices[0]}, ${step.indices[1]})`
     case 'swap':
       return `swap(${step.indices[0]}, ${step.indices[1]})`
+    case 'overwrite':
+      return `overwrite(${step.index} = ${step.value})`
     case 'done':
       return 'done'
   }
