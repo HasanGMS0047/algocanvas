@@ -7,16 +7,17 @@ import { PlayerControls } from './PlayerControls'
 
 interface SortVisualizerProps {
   frames: Frame[]
+  treeOverlay?: boolean
 }
 
-export function SortVisualizer({ frames }: SortVisualizerProps) {
+export function SortVisualizer({ frames, treeOverlay }: SortVisualizerProps) {
   const player = usePlayer({ frameCount: frames.length, msPerFrame: 500 })
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-      renderArrayFrame(ctx, width, height, frames[player.index])
+      renderArrayFrame(ctx, width, height, frames[player.index], { treeOverlay })
     },
-    [frames, player.index],
+    [frames, player.index, treeOverlay],
   )
 
   return (
