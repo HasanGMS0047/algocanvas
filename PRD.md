@@ -15,31 +15,29 @@ The interface should feel premium: dark theme, considered typography,
 smooth motion, a canvas that invites exploration rather than a static demo
 page.
 
-## 2. What exists today (v1 — shipped)
+## 2. What exists today (v2 — Phases 7–10 shipped)
 
-16 algorithms, each fully interactive (play/pause/step/scrub/speed,
+19 algorithms, each fully interactive (play/pause/step/scrub/speed,
 keyboard shortcuts), built on a shared generator → recorder → renderer
-architecture (§4), with a 108-test Vitest suite covering correctness and
+architecture (§4), with a 147-test Vitest suite covering correctness and
 structural invariants:
 
 - **Comparison sorts (6):** Bubble, Selection, Insertion, Quick, Merge, Heap
 - **Non-comparison sorts (3):** Counting, Radix, Bucket
+- **Graphs (3):** BFS, DFS, Dijkstra
 - **Trees (6):** Binary Tree (+ full/complete/perfect shape classification),
   BST (insert/search/delete, all 3 delete cases), AVL (rotations), Red-Black
   (color + rotations), B-Tree (multi-key nodes, splits), Trie (prefix sharing)
 - **Hashing (1):** Hash Table with chaining collision resolution
 
-**Known gap:** graph algorithms (BFS, DFS, Dijkstra) were in the original
-scope for this phase and were never actually built — the build order skipped
-straight from sorts to trees. This should be treated as unfinished v1 work,
-not new scope.
-
-**The core limitation driving this rewrite of the PRD:** every algorithm
-runs against a single hardcoded demo input, chosen by hand to exercise
-interesting cases (collisions, rotations, splits, etc.). There is no way for
-a user to supply their own array, graph, or tree. That was the original
-complaint that started this planning pass, and it's the most important gap
-to close.
+Dark theme by default (§Phase 8's palette), a "Think Like the Algorithm"
+predict mode on Quick Sort and AVL insert (§Phase 7), and custom input for
+every algorithm family (§Phase 10): array editor for sorts and B-Tree/BST/
+AVL/RB insert sequences, word-list editor for Trie, and a text-based graph
+editor (edge list + start-node picker) for BFS/DFS/Dijkstra — each with its
+own validation and a safe fallback to a curated default on invalid input.
+The original "everything runs on one hardcoded demo array" limitation that
+started this rewrite is fully closed.
 
 ## 3. What this PRD does *not* commit to (yet)
 
@@ -86,7 +84,7 @@ A state machine driving playback, now needing a new state for predict-mode:
 Each phase is still one PR-sized chunk at a time, verified in-browser and
 committed individually — same discipline as v1.
 
-**Phase 7 — "Think Like the Algorithm" (predict mode)**
+**Phase 7 — "Think Like the Algorithm" (predict mode)** ✅ Shipped
 - Extend the step vocabulary so specific step types can be flagged as
   "decision points" (pivot choice in Quick Sort, next node in BFS/DFS,
   minimum tentative distance in Dijkstra once it exists, rotation case in
@@ -98,7 +96,7 @@ committed individually — same discipline as v1.
   Sort pivot/partition, BST/AVL insert direction, one graph algorithm once
   Phase 9 lands) rather than retrofitting all 16 at once
 
-**Phase 8 — Visual redesign**
+**Phase 8 — Visual redesign** ✅ Shipped
 - Dark theme as default: background `#09090B`, panels `#18181B`, accents
   (blue `#4F8BFF`, purple `#7C5CFC`, green `#32D583`, orange `#F79009`,
   danger `#F04438`) — reusing these as the new highlight-color system
@@ -107,12 +105,12 @@ committed individually — same discipline as v1.
 - Landing/intro treatment for the algorithm picker; this is a visual pass,
   not a new page/routing structure
 
-**Phase 9 — Graph algorithms (the missed v1 phase)**
+**Phase 9 — Graph algorithms (the missed v1 phase)** ✅ Shipped
 - Graph renderer (nodes/edges, force-ish fixed layout — doesn't need to be
   physics-based)
 - BFS, DFS, Dijkstra
 
-**Phase 10 — Custom user input**
+**Phase 10 — Custom user input** ✅ Shipped
 - Per-algorithm input UI appropriate to its data shape: array editor for
   sorts, node/edge editor for graphs and trees
 - Validate input against each algorithm's preconditions (e.g. BST insert
@@ -122,7 +120,7 @@ committed individually — same discipline as v1.
 - This directly replaces the fixed `DEMO_ARRAY` / hardcoded insert
   sequences used throughout v1
 
-**Phase 11 — Algorithm library expansion**
+**Phase 11 — Algorithm library expansion** ⏳ Up next
 Only after 7–10 are solid. Candidates, roughly in order of reusing existing
 renderers vs. needing new ones:
 - Searching: Linear, Binary, Jump, Interpolation (reuse array renderer)
