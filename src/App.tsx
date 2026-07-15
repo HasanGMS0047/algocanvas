@@ -253,7 +253,16 @@ function App() {
   )
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100%',
+        maxWidth: '1600px',
+        margin: '0 auto',
+      }}
+    >
       <AppHeader
         algorithms={ALL_ALGORITHMS}
         selectedId={algorithmId}
