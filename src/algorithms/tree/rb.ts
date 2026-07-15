@@ -10,12 +10,13 @@ interface Node {
 
 // Exercises both fixup paths: an early run of increasing values forces
 // rotation-based fixups (uncle black), and later insertions land under a
-// red uncle, forcing the recolor-and-move-up case instead.
-const INSERT_SEQUENCE = [10, 20, 30, 15, 25, 5, 1, 7]
+// red uncle, forcing the recolor-and-move-up case instead. Used as the
+// default when no custom sequence is provided.
+export const DEFAULT_INSERT_SEQUENCE = [10, 20, 30, 15, 25, 5, 1, 7]
 
-export function* redBlackTree(): Generator<TreeStep> {
+export function* redBlackTree(insertSequence: number[] = DEFAULT_INSERT_SEQUENCE): Generator<TreeStep> {
   let root: Node | null = null
-  for (const value of INSERT_SEQUENCE) {
+  for (const value of insertSequence) {
     root = yield* insert(root, value)
   }
   yield { type: 'done' }

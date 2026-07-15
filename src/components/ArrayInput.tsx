@@ -5,13 +5,22 @@ interface ArrayInputProps {
   value: number[]
   onChange: (value: number[]) => void
   error?: string
+  placeholder?: string
+  randomLengthRange?: [number, number]
+  randomValueMax?: number
 }
 
-const RANDOM_LENGTH_MIN = 8
-const RANDOM_LENGTH_MAX = 10
-const RANDOM_VALUE_MAX = 20
+const DEFAULT_RANDOM_LENGTH_RANGE: [number, number] = [8, 10]
+const DEFAULT_RANDOM_VALUE_MAX = 20
 
-export function ArrayInput({ value, onChange, error }: ArrayInputProps) {
+export function ArrayInput({
+  value,
+  onChange,
+  error,
+  placeholder = 'e.g. 8, 3, 9, 1, 6',
+  randomLengthRange = DEFAULT_RANDOM_LENGTH_RANGE,
+  randomValueMax = DEFAULT_RANDOM_VALUE_MAX,
+}: ArrayInputProps) {
   const [text, setText] = useState(value.join(', '))
   const [parseError, setParseError] = useState<string | null>(null)
 
@@ -34,8 +43,9 @@ export function ArrayInput({ value, onChange, error }: ArrayInputProps) {
   }
 
   const randomize = () => {
-    const length = RANDOM_LENGTH_MIN + Math.floor(Math.random() * (RANDOM_LENGTH_MAX - RANDOM_LENGTH_MIN + 1))
-    const random = Array.from({ length }, () => 1 + Math.floor(Math.random() * RANDOM_VALUE_MAX))
+    const [min, max] = randomLengthRange
+    const length = min + Math.floor(Math.random() * (max - min + 1))
+    const random = Array.from({ length }, () => 1 + Math.floor(Math.random() * randomValueMax))
     onChange(random)
   }
 
@@ -50,7 +60,7 @@ export function ArrayInput({ value, onChange, error }: ArrayInputProps) {
         onKeyDown={(e) => {
           if (e.key === 'Enter') commit()
         }}
-        placeholder="e.g. 8, 3, 9, 1, 6"
+        placeholder={placeholder}
       />
       <button type="button" onClick={randomize}>
         Randomize

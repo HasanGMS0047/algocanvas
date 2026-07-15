@@ -9,7 +9,12 @@ export const DEMO_TREE: TreeNodeSpec = {
   right: { value: 3 },
 }
 
-export function* binaryTree(): Generator<TreeStep> {
+// Takes an (ignored) sequence parameter purely so its `run` signature
+// matches the other tree algorithms in the registry - this one always
+// demonstrates the same hand-picked DEMO_TREE, since the whole point is a
+// specific curated shape (full + complete but not perfect), not something
+// a generic insert sequence should be able to override.
+export function* binaryTree(_insertSequence?: number[]): Generator<TreeStep> {
   yield* insertLevelOrder(DEMO_TREE)
   yield {
     type: 'classify',

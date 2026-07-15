@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SORT_ALGORITHMS } from './algorithms'
 import { BTREE_ALGORITHMS } from './algorithms/btree'
 import { recordBTreeFrames } from './algorithms/btree/recordBTreeFrames'
@@ -29,6 +29,7 @@ import { useAlgorithmKind } from './useAlgorithmKind'
 import { validateArray } from './validateArray'
 
 const DEFAULT_ARRAY = [8, 3, 9, 1, 6, 4, 7, 2, 5, 10]
+const TREE_SEQUENCE_MAX_LENGTH = 12
 const ALL_ALGORITHMS = [
   ...SORT_ALGORITHMS,
   ...DISTRIBUTION_ALGORITHMS,
@@ -43,9 +44,32 @@ const SORT_AND_DIST_IDS = new Set([...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHM
 function App() {
   const [algorithmId, setAlgorithmId] = useState(ALL_ALGORITHMS[0].id)
   const [customArray, setCustomArray] = useState<number[]>(DEFAULT_ARRAY)
+  const [customTreeSequence, setCustomTreeSequence] = useState<number[] | null>(null)
 
   const validation = useMemo(() => validateArray(customArray, algorithmId), [customArray, algorithmId])
   const effectiveArray = validation.valid ? customArray : DEFAULT_ARRAY
+
+  // Each tree/B-tree algorithm has its own curated default sequence (chosen
+  // to demonstrate specific rotation/split/fixup cases). Reset to "use that
+  // default" whenever the algorithm changes, rather than carrying one
+  // algorithm's custom sequence over to another.
+  const treeDefault =
+    TREE_ALGORITHMS.find((a) => a.id === algorithmId)?.defaultSequence ??
+    BTREE_ALGORITHMS.find((a) => a.id === algorithmId)?.defaultSequence
+
+  useEffect(() => {
+    setCustomTreeSequence(null)
+  }, [algorithmId])
+
+  const treeValidation = useMemo(
+    () => (treeDefault ? validateArray(customTreeSequence ?? treeDefault, algorithmId, { maxLength: TREE_SEQUENCE_MAX_LENGTH }) : null),
+    [customTreeSequence, treeDefault, algorithmId],
+  )
+  const effectiveTreeSequence = useMemo(() => {
+    if (!treeDefault) return undefined
+    const candidate = customTreeSequence ?? treeDefault
+    return treeValidation?.valid ? candidate : treeDefault
+  }, [customTreeSequence, treeDefault, treeValidation])
 
   const sort = useAlgorithmKind(
     algorithmId,
@@ -65,8 +89,20 @@ function App() {
     [effectiveArray],
   )
   const graph = useAlgorithmKind(algorithmId, GRAPH_ALGORITHMS, (a) => recordGraphFrames(a.run), renderGraphFrame)
-  const tree = useAlgorithmKind(algorithmId, TREE_ALGORITHMS, (a) => recordTreeFrames(a.run), renderTreeFrame)
-  const bTree = useAlgorithmKind(algorithmId, BTREE_ALGORITHMS, (a) => recordBTreeFrames(a.run), renderBTreeFrame)
+  const tree = useAlgorithmKind(
+    algorithmId,
+    TREE_ALGORITHMS,
+    (a) => recordTreeFrames(() => a.run(effectiveTreeSequence)),
+    renderTreeFrame,
+    [effectiveTreeSequence],
+  )
+  const bTree = useAlgorithmKind(
+    algorithmId,
+    BTREE_ALGORITHMS,
+    (a) => recordBTreeFrames(() => a.run(effectiveTreeSequence)),
+    renderBTreeFrame,
+    [effectiveTreeSequence],
+  )
   const trie = useAlgorithmKind(algorithmId, TRIE_ALGORITHMS, (a) => recordTrieFrames(a.run), renderTrieFrame)
   const hashTable = useAlgorithmKind(
     algorithmId,
@@ -80,6 +116,16 @@ function App() {
       <AppHeader algorithms={ALL_ALGORITHMS} selectedId={algorithmId} onChange={setAlgorithmId} />
       {SORT_AND_DIST_IDS.has(algorithmId) && (
         <ArrayInput value={customArray} onChange={setCustomArray} error={validation.error} />
+      )}
+      {treeDefault && (
+        <ArrayInput
+          value={customTreeSequence ?? treeDefault}
+          onChange={setCustomTreeSequence}
+          error={treeValidation?.error}
+          placeholder="Insert sequence, e.g. 8, 3, 10, 1, 6"
+          randomLengthRange={[6, 9]}
+          randomValueMax={50}
+        />
       )}
       {sort && (
         <Visualizer
