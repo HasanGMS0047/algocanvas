@@ -1,0 +1,71 @@
+.graph-input {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 24px;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.graph-input-field {
+  flex: 1 1 320px;
+  min-width: 240px;
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  resize: vertical;
+}
+
+.graph-input-field:focus {
+  outline: none;
+  border-color: var(--color-accent-blue);
+}
+
+.graph-input-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.graph-input-start {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.graph-input-start select {
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}
+
+.graph-input button {
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.graph-input button:hover {
+  border-color: var(--color-accent-blue);
+}
+
+.graph-input-error {
+  color: var(--color-danger);
+  font-size: 13px;
+  max-width: 220px;
+}

@@ -1,17 +1,17 @@
 import { DEMO_GRAPH, DEMO_START } from './demoGraph'
-import type { GraphStep } from './types'
+import type { GraphSpec, GraphStep } from './types'
 import { buildWeightedAdjacency } from './utils'
 
-export function* dijkstra(): Generator<GraphStep> {
-  const adjacency = buildWeightedAdjacency(DEMO_GRAPH)
+export function* dijkstra(graph: GraphSpec = DEMO_GRAPH, start: string = DEMO_START): Generator<GraphStep> {
+  const adjacency = buildWeightedAdjacency(graph)
   const distances = new Map<string, number>()
   const finalized = new Set<string>()
 
-  for (const node of DEMO_GRAPH.nodes) distances.set(node.id, Infinity)
-  distances.set(DEMO_START, 0)
-  yield { type: 'relax', nodeId: DEMO_START, distance: 0 }
+  for (const node of graph.nodes) distances.set(node.id, Infinity)
+  distances.set(start, 0)
+  yield { type: 'relax', nodeId: start, distance: 0 }
 
-  while (finalized.size < DEMO_GRAPH.nodes.length) {
+  while (finalized.size < graph.nodes.length) {
     let current: string | null = null
     let currentDistance = Infinity
     for (const [id, distance] of distances) {

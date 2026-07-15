@@ -1,13 +1,13 @@
 import { DEMO_GRAPH, DEMO_START } from './demoGraph'
-import type { GraphStep } from './types'
+import type { GraphSpec, GraphStep } from './types'
 import { buildAdjacency } from './utils'
 
-export function* bfs(): Generator<GraphStep> {
-  const adjacency = buildAdjacency(DEMO_GRAPH)
-  const visited = new Set<string>([DEMO_START])
-  const queue: string[] = [DEMO_START]
+export function* bfs(graph: GraphSpec = DEMO_GRAPH, start: string = DEMO_START): Generator<GraphStep> {
+  const adjacency = buildAdjacency(graph)
+  const visited = new Set<string>([start])
+  const queue: string[] = [start]
 
-  yield { type: 'visit', nodeId: DEMO_START }
+  yield { type: 'visit', nodeId: start }
 
   while (queue.length > 0) {
     const current = queue.shift()!

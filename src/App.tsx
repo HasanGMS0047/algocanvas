@@ -5,7 +5,10 @@ import { recordBTreeFrames } from './algorithms/btree/recordBTreeFrames'
 import { DISTRIBUTION_ALGORITHMS } from './algorithms/distribution'
 import { recordDistributionFrames } from './algorithms/distribution/recordDistributionFrames'
 import { GRAPH_ALGORITHMS } from './algorithms/graph'
+import { DEMO_GRAPH, DEMO_START } from './algorithms/graph/demoGraph'
+import { parseGraphText } from './algorithms/graph/parseGraphText'
 import { recordGraphFrames } from './algorithms/graph/recordGraphFrames'
+import { graphToText } from './algorithms/graph/utils'
 import { HASHTABLE_ALGORITHMS } from './algorithms/hashtable'
 import { recordHashTableFrames } from './algorithms/hashtable/recordHashTableFrames'
 import { recordFrames } from './algorithms/recordFrames'
@@ -15,6 +18,7 @@ import { TRIE_ALGORITHMS } from './algorithms/trie'
 import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
 import { AppHeader } from './components/AppHeader'
 import { ArrayInput } from './components/ArrayInput'
+import { GraphInput } from './components/GraphInput'
 import { Visualizer } from './components/Visualizer'
 import { WordListInput } from './components/WordListInput'
 import { avlPredictor } from './predict/avlPredictor'
@@ -44,12 +48,16 @@ const ALL_ALGORITHMS = [
 const SORT_AND_DIST_IDS = new Set([...SORT_ALGORITHMS, ...DISTRIBUTION_ALGORITHMS].map((a) => a.id))
 const TRIE_IDS = new Set(TRIE_ALGORITHMS.map((a) => a.id))
 const DEFAULT_TRIE_WORDS = TRIE_ALGORITHMS[0].defaultWords
+const GRAPH_IDS = new Set(GRAPH_ALGORITHMS.map((a) => a.id))
+const DEFAULT_GRAPH_TEXT = graphToText(DEMO_GRAPH)
 
 function App() {
   const [algorithmId, setAlgorithmId] = useState(ALL_ALGORITHMS[0].id)
   const [customArray, setCustomArray] = useState<number[]>(DEFAULT_ARRAY)
   const [customTreeSequence, setCustomTreeSequence] = useState<number[] | null>(null)
   const [customWords, setCustomWords] = useState<string[]>(DEFAULT_TRIE_WORDS)
+  const [customGraphText, setCustomGraphText] = useState<string | null>(null)
+  const [customStartNode, setCustomStartNode] = useState<string | null>(null)
 
   const validation = useMemo(() => validateArray(customArray, algorithmId), [customArray, algorithmId])
   const effectiveArray = validation.valid ? customArray : DEFAULT_ARRAY
@@ -93,7 +101,23 @@ function App() {
     renderBucketFrame,
     [effectiveArray],
   )
-  const graph = useAlgorithmKind(algorithmId, GRAPH_ALGORITHMS, (a) => recordGraphFrames(a.run), renderGraphFrame)
+  const graphParse = useMemo(
+    () => (customGraphText !== null ? parseGraphText(customGraphText) : null),
+    [customGraphText],
+  )
+  const effectiveGraph = graphParse?.graph ?? DEMO_GRAPH
+  const effectiveStart = useMemo(() => {
+    if (customStartNode && effectiveGraph.nodes.some((n) => n.id === customStartNode)) return customStartNode
+    return effectiveGraph.nodes[0]?.id ?? DEMO_START
+  }, [customStartNode, effectiveGraph])
+
+  const graph = useAlgorithmKind(
+    algorithmId,
+    GRAPH_ALGORITHMS,
+    (a) => recordGraphFrames(() => a.run(effectiveGraph, effectiveStart)),
+    (ctx, w, h, frame) => renderGraphFrame(ctx, w, h, frame, effectiveGraph),
+    [effectiveGraph, effectiveStart],
+  )
   const tree = useAlgorithmKind(
     algorithmId,
     TREE_ALGORITHMS,
@@ -143,6 +167,16 @@ function App() {
       )}
       {TRIE_IDS.has(algorithmId) && (
         <WordListInput value={customWords} onChange={setCustomWords} error={wordsValidation.error} />
+      )}
+      {GRAPH_IDS.has(algorithmId) && (
+        <GraphInput
+          value={customGraphText ?? DEFAULT_GRAPH_TEXT}
+          onChange={setCustomGraphText}
+          error={graphParse?.error}
+          startNode={effectiveStart}
+          onStartNodeChange={setCustomStartNode}
+          nodeIds={effectiveGraph.nodes.map((n) => n.id)}
+        />
       )}
       {sort && (
         <Visualizer

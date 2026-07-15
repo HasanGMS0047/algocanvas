@@ -1,12 +1,12 @@
 import { DEMO_GRAPH, DEMO_START } from './demoGraph'
-import type { GraphStep } from './types'
+import type { GraphSpec, GraphStep } from './types'
 import { buildAdjacency } from './utils'
 
-export function* dfs(): Generator<GraphStep> {
-  const adjacency = buildAdjacency(DEMO_GRAPH)
+export function* dfs(graph: GraphSpec = DEMO_GRAPH, start: string = DEMO_START): Generator<GraphStep> {
+  const adjacency = buildAdjacency(graph)
   const visited = new Set<string>()
 
-  yield* visitNode(DEMO_START)
+  yield* visitNode(start)
   yield { type: 'done' }
 
   function* visitNode(nodeId: string): Generator<GraphStep> {
