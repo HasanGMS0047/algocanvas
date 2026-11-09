@@ -2,7 +2,7 @@
 
 **Watch algorithms think** — not "watch bars move." Pause before Quick Sort picks a side for its pivot, predict which partition it lands in, then find out why you were right or wrong. Step through Bellman-Ford relaxing a negative-weight edge and get a plain-English sentence explaining exactly why that number just changed.
 
-AlgoCanvas is a from-scratch algorithm visualizer: 27 algorithms, 218 tests, zero charting or animation libraries — just React, TypeScript, and a `<canvas>` that draws exactly what the algorithm actually did, one frame at a time.
+AlgoCanvas is a from-scratch algorithm visualizer: 29 algorithms, 250 tests, zero charting or animation libraries — just React, TypeScript, and a `<canvas>` that draws exactly what the algorithm actually did, one frame at a time.
 
 ## Why this exists
 
@@ -10,7 +10,7 @@ Most algorithm visualizers are either a hardcoded GIF pretending to be interacti
 
 - Every algorithm is a real **generator function** — the actual algorithm runs, yielding a description of each step, not a script faking a sort while a separate layer animates.
 - Every non-obvious claim is checked against an independent source, not just against itself: Bellman-Ford's final distances are cross-checked against Dijkstra; Prim's MST weight is cross-checked against a brute-force search over every spanning tree; a Red-Black tree's rotations are hand-traced before the test that asserts them is written.
-- Every visual feature is driven through a real (headless) browser across all 27 algorithms before it's committed — "it compiles" has never been the bar here.
+- Every visual feature is driven through a real (headless) browser across all 29 algorithms before it's committed — "it compiles" has never been the bar here.
 
 ## What's inside
 
@@ -19,12 +19,12 @@ Most algorithm visualizers are either a hardcoded GIF pretending to be interacti
 | Comparison sorts | Bubble, Selection, Insertion, Quick, Merge, Heap |
 | Non-comparison sorts | Counting, Radix, Bucket |
 | Searching | Linear, Binary, Jump, Interpolation |
-| Graphs | BFS, DFS, Dijkstra, Bellman-Ford, Prim's MST, Kruskal's MST |
+| Graphs | BFS, DFS, BFS Shortest Path, DFS Shortest Path, Dijkstra, Bellman-Ford, Prim's MST, Kruskal's MST |
 | Trees | Binary Tree, BST, AVL, Red-Black, B-Tree, Trie |
 | Hashing | Hash Table (separate chaining) |
 | Dynamic Programming | Longest Increasing Subsequence |
 
-None of them run on a fixed demo dataset — every one takes **your** input: type an array, sketch a graph (negative edge weights included, if you pick the one algorithm that handles them correctly), list some words for the Trie, or describe a tree shape LeetCode-style (`1, 2, 3, null, null, 4, 5`).
+None of them run on a fixed demo dataset — every one takes **your** input: type an array, sketch a graph as an edge list or, for BFS/DFS, a Python-style adjacency list like `A: [B, C]` (negative edge weights included, if you pick the one algorithm that handles them correctly), list some words for the Trie, or describe a tree shape LeetCode-style (`1, 2, 3, null, null, 4, 5`).
 
 ## Beyond play/pause
 
@@ -74,7 +74,7 @@ npm run dev
 ```
 
 ```bash
-npm test         # 218 tests, pure logic - no browser required
+npm test         # 250 tests, pure logic - no browser required
 npm run test:watch
 npm run lint      # oxlint
 npm run build     # typecheck + production build
