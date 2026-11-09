@@ -4,6 +4,10 @@ import type { GraphNodeSpec, GraphSpec } from './types'
 // edge-array order, so traversal order is deterministic and reproducible.
 export function buildAdjacency(graph: GraphSpec): Map<string, string[]> {
   const map = new Map<string, string[]>()
+  if (graph.adjacency) {
+    for (const node of graph.nodes) map.set(node.id, [...(graph.adjacency[node.id] ?? [])])
+    return map
+  }
   for (const node of graph.nodes) map.set(node.id, [])
   for (const edge of graph.edges) {
     map.get(edge.from)!.push(edge.to)
@@ -39,7 +43,32 @@ export function circularLayout(nodeIds: string[]): GraphNodeSpec[] {
 // Inverse of parseGraphText's line format - used to seed the editor with
 // the demo graph's edges as editable starting text.
 export function graphToText(graph: GraphSpec): string {
-  return graph.edges
-    .map((e) => (e.weight !== undefined ? `${e.from}-${e.to}:${e.weight}` : `${e.from}-${e.to}`))
-    .join('\n')
+  const lines = graph.edges.map((e) =>
+    e.weight !== undefined ? `${e.from}-${e.to}:${e.weight}` : `${e.from}-${e.to}`,
+  )
+  // A node with no edges can only be written as a bare id on its own line.
+  const connected = new Set(graph.edges.flatMap((e) => [e.from, e.to]))
+  for (const node of graph.nodes) if (!connected.has(node.id)) lines.push(node.id)
+  return lines.join('\n')
+}
+
+// Python-dict-style view of the graph: one "node: [neighbours]" line per
+// node, listing every neighbour (the graph is undirected, so each edge
+// shows up under both endpoints).
+export function graphToAdjacencyText(graph: GraphSpec): string {
+  const adjacency = buildAdjacency(graph)
+  return graph.nodes.map((n) => `${n.id}: [${(adjacency.get(n.id) ?? []).join(', ')}]`).join('\n')
+}
+
+// Re-attaches weights from a previous version of the graph to edges that
+// still exist - so a round trip through the (unweighted) adjacency-list view
+// doesn't silently wipe the weights Dijkstra etc. rely on.
+export function mergeWeights(graph: GraphSpec, previous: GraphSpec | null): GraphSpec {
+  if (!previous) return graph
+  const key = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`)
+  const weights = new Map(previous.edges.map((e) => [key(e.from, e.to), e.weight]))
+  return {
+    ...graph,
+    edges: graph.edges.map((e) => ({ ...e, weight: e.weight ?? weights.get(key(e.from, e.to)) })),
+  }
 }

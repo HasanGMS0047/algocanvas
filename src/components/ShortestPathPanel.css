@@ -1,0 +1,86 @@
+.path-panel {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 10px 20px;
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+.path-panel-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Status dot: takes the label's colour, so the state is still readable
+   without relying on colour alone (the label text changes too). */
+.path-panel-label::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.path-panel[data-state='found'] .path-panel-label {
+  color: var(--color-accent-purple);
+}
+
+.path-panel[data-state='partial'] .path-panel-label {
+  color: var(--color-accent-orange);
+}
+
+.path-panel[data-state='none'] .path-panel-label {
+  color: var(--color-danger);
+}
+
+.path-panel-route {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.path-panel-route li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.path-panel-node {
+  min-width: 28px;
+  padding: 2px 8px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-panel);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.path-panel-arrow {
+  color: var(--color-text-muted);
+}
+
+.path-panel-length,
+.path-panel-text {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .path-panel {
+    padding: 8px 16px;
+  }
+}

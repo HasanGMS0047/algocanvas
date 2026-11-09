@@ -25,6 +25,7 @@ structural invariants:
 - **Comparison sorts (6):** Bubble, Selection, Insertion, Quick, Merge, Heap
 - **Non-comparison sorts (3):** Counting, Radix, Bucket
 - **Graphs (3):** BFS, DFS, Dijkstra
+  (since extended - see "Shortest-path and adjacency-list input" under Phase 11)
 - **Trees (6):** Binary Tree (+ full/complete/perfect shape classification),
   BST (insert/search/delete, all 3 delete cases), AVL (rotations), Red-Black
   (color + rotations), B-Tree (multi-key nodes, splits), Trie (prefix sharing)
@@ -119,6 +120,18 @@ committed individually — same discipline as v1.
   by hand
 - This directly replaces the fixed `DEMO_ARRAY` / hardcoded insert
   sequences used throughout v1
+
+**Shortest-path and adjacency-list input** ✅ Shipped (part of Phase 11)
+- BFS Shortest Path and DFS Shortest Path, with an end-node picker and a
+  result panel that shows the route and its edge count (or "no path").
+  "Shortest" means fewest edges; DFS explores every route with pruning and
+  keeps the best, so it reads as the contrast to BFS's first-hit guarantee.
+- BFS/DFS and both shortest-path algorithms accept a Python-style adjacency
+  list (`A: [B, C]`, or a pasted dict literal) as an alternative to the edge
+  list, keeping neighbour order as written. Weighted algorithms stay
+  edge-list only, since adjacency lists carry no weights.
+- Graphs remain undirected. Directed graphs (arrowheads, `A>B` syntax) are
+  an open question, not committed.
 
 **Phase 11 — Algorithm library expansion** ⏳ Up next
 Only after 7–10 are solid. Candidates, roughly in order of reusing existing

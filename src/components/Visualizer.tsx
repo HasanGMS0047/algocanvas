@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import type { Explainer } from '../explain/types'
 import { usePlayer } from '../player/usePlayer'
 import { useKeyboardShortcuts } from '../player/useKeyboardShortcuts'
@@ -15,9 +15,19 @@ interface VisualizerProps<T> {
   predictor?: Predictor<T>
   explainer?: Explainer<T>
   algorithmId?: string
+  // Optional strip rendered under the canvas that depends on the current
+  // frame (e.g. the shortest-path result).
+  extraPanel?: (frame: T) => ReactNode
 }
 
-export function Visualizer<T>({ frames, render, predictor, explainer, algorithmId = '' }: VisualizerProps<T>) {
+export function Visualizer<T>({
+  frames,
+  render,
+  predictor,
+  explainer,
+  algorithmId = '',
+  extraPanel,
+}: VisualizerProps<T>) {
   const player = usePlayer({ frameCount: frames.length, msPerFrame: 900 })
   const [predictModeEnabled, setPredictModeEnabled] = useState(false)
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
@@ -61,6 +71,7 @@ export function Visualizer<T>({ frames, render, predictor, explainer, algorithmI
         </div>
       )}
       <AlgoCanvas draw={draw} />
+      {extraPanel?.(frames[player.index])}
       {prediction && (
         <PredictionPanel
           prediction={prediction}

@@ -6,8 +6,9 @@ export interface GraphParseResult {
   error?: string
 }
 
-const MAX_NODES = 10
-const MAX_EDGES = 20
+export const MAX_NODES = 10
+export const MAX_EDGES = 20
+const NODE_LINE = /^[A-Za-z0-9]+$/
 const EDGE_LINE = /^([A-Za-z0-9]+)\s*-\s*([A-Za-z0-9]+)\s*(?::\s*(-?\d+(?:\.\d+)?))?$/
 
 export interface ParseGraphTextOptions {
@@ -42,6 +43,15 @@ export function parseGraphText(text: string, options: ParseGraphTextOptions = {}
   const edges: GraphSpec['edges'] = []
 
   for (const line of lines) {
+    // A bare id on its own line adds a node with no edges.
+    if (NODE_LINE.test(line)) {
+      if (!nodeSet.has(line)) {
+        nodeSet.add(line)
+        nodeOrder.push(line)
+      }
+      continue
+    }
+
     const match = EDGE_LINE.exec(line)
     if (!match) {
       return { graph: null, error: `Can't parse "${line}". Use A-B or A-B:weight.` }

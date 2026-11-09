@@ -6,8 +6,29 @@ export function explainGraphStep(frame: GraphFrame, algorithmId: string): string
   if (step.type === 'start') return 'Starting the traversal.'
   if (step.type === 'done') return 'Traversal complete.'
 
+  if (step.type === 'pathFound') {
+    const hops = step.path.length - 1
+    const route = step.path.join(' → ')
+    if (algorithmId === 'dfs-path') {
+      return `Reached the target! Path ${route} has ${hops} edge${hops === 1 ? '' : 's'}. DFS can't tell if that's the shortest, so it remembers it as the best so far and backtracks to try other routes - only strictly shorter ones can replace it.`
+    }
+    return `Reached the target! BFS explores in rings of equal distance, so the first time it discovers the target is guaranteed to be via a shortest path: ${route} (${hops} edge${hops === 1 ? '' : 's'}).`
+  }
+
+  if (step.type === 'noPath') {
+    return 'Every reachable node has been explored and the target was never found - there is no path from the start to the target.'
+  }
+
+  if (step.type === 'backtrack') {
+    return `Done with ${step.nodeId} - backing up to ${step.stack[step.stack.length - 1] ?? 'the start'} to try its remaining neighbors. ${step.nodeId} is freed up, so a different route may pass through it.`
+  }
+
   if (step.type === 'visit') {
     switch (algorithmId) {
+      case 'bfs-path':
+        return `Discovering node ${step.nodeId} and remembering which node it was reached from, so the path can be rebuilt backwards once the target is found.`
+      case 'dfs-path':
+        return `Stepping onto ${step.nodeId} - the path so far is ${(step.stack ?? [step.nodeId]).join(' → ')}.`
       case 'bfs':
         return `Visiting node ${step.nodeId} - BFS explores level by level, using a queue so nodes are visited in the order they were first discovered.`
       case 'dfs':
@@ -27,6 +48,10 @@ export function explainGraphStep(frame: GraphFrame, algorithmId: string): string
 
   if (step.type === 'visitEdge') {
     switch (algorithmId) {
+      case 'bfs-path':
+        return `Looking at the edge ${step.from}-${step.to}: if ${step.to} hasn't been reached yet, it's one step further from the start than ${step.from}.`
+      case 'dfs-path':
+        return `Looking at the edge ${step.from}-${step.to}. It's skipped if ${step.to} is already on the current path (no loops) or if going there can't beat the best path found so far.`
       case 'dijkstra':
         return `Looking at the edge ${step.from}-${step.to} to see if going through ${step.from} gives a shorter path to ${step.to}.`
       case 'prim':

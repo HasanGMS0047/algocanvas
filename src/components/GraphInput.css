@@ -37,6 +37,13 @@
   gap: 8px;
 }
 
+.graph-input-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
 .graph-input-start {
   display: flex;
   align-items: center;
@@ -89,6 +96,39 @@
 .graph-input button:active {
   box-shadow: 2px 2px 0 0 var(--color-accent-blue);
   transform: translate(-2px, -2px);
+}
+
+/* Segmented two-way format switch: the pressed half is filled, the pair
+   shares one border so it reads as a single control. */
+.graph-input-mode {
+  display: inline-flex;
+}
+
+.graph-input-mode button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.graph-input-mode button + button {
+  margin-left: -2px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.graph-input-mode button:first-child {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.graph-input .graph-input-mode button[aria-pressed='true'] {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-accent-blue) 22%, var(--color-panel));
+  border-color: var(--color-accent-blue);
+  position: relative;
+}
+
+.graph-input-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  max-width: 260px;
 }
 
 .graph-input-error {

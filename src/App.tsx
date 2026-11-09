@@ -8,9 +8,10 @@ import { DP_ALGORITHMS } from './algorithms/dp'
 import { recordLisFrames } from './algorithms/dp/recordLisFrames'
 import { GRAPH_ALGORITHMS } from './algorithms/graph'
 import { DEMO_GRAPH, DEMO_START } from './algorithms/graph/demoGraph'
+import { parseAdjacencyText } from './algorithms/graph/parseAdjacencyText'
 import { parseGraphText } from './algorithms/graph/parseGraphText'
 import { recordGraphFrames } from './algorithms/graph/recordGraphFrames'
-import { graphToText } from './algorithms/graph/utils'
+import { graphToAdjacencyText, graphToText, mergeWeights } from './algorithms/graph/utils'
 import { HASHTABLE_ALGORITHMS } from './algorithms/hashtable'
 import { HEAP_ALGORITHMS } from './algorithms/heap'
 import { recordHeapFrames } from './algorithms/heap/recordHeapFrames'
@@ -25,7 +26,8 @@ import { TRIE_ALGORITHMS } from './algorithms/trie'
 import { recordTrieFrames } from './algorithms/trie/recordTrieFrames'
 import { AppHeader } from './components/AppHeader'
 import { ArrayInput } from './components/ArrayInput'
-import { GraphInput } from './components/GraphInput'
+import { GraphInput, type GraphInputMode } from './components/GraphInput'
+import { ShortestPathPanel } from './components/ShortestPathPanel'
 import { ShowValuesToggle } from './components/ShowValuesToggle'
 import { TargetInput } from './components/TargetInput'
 import { TreeShapeInput } from './components/TreeShapeInput'
@@ -131,6 +133,12 @@ function App() {
   const [customWords, setCustomWords] = useState<string[]>(DEFAULT_TRIE_WORDS)
   const [customGraphText, setCustomGraphText] = useState<string | null>(null)
   const [customStartNode, setCustomStartNode] = useState<string | null>(null)
+  const [customGraphTarget, setCustomGraphTarget] = useState<string | null>(null)
+  // The graph is edited either as an edge list (the canonical form, used by
+  // every graph algorithm) or - for the unweighted ones - as a Python-style
+  // adjacency list. Each format keeps its own text; switching converts.
+  const [graphMode, setGraphMode] = useState<GraphInputMode>('edges')
+  const [customAdjacencyText, setCustomAdjacencyText] = useState<string>('')
   const [customTarget, setCustomTarget] = useState<number | null>(null)
   const [customTreeShapeText, setCustomTreeShapeText] = useState<string | null>(null)
   const [showValues, setShowValues] = useState(true)
@@ -209,23 +217,66 @@ function App() {
 
   const currentGraphAlgorithm = GRAPH_ALGORITHMS.find((a) => a.id === algorithmId)
   const allowNegativeWeights = currentGraphAlgorithm?.allowsNegativeWeights ?? false
-  const graphParse = useMemo(
-    () => (customGraphText !== null ? parseGraphText(customGraphText, { allowNegativeWeights }) : null),
-    [customGraphText, allowNegativeWeights],
-  )
+  const usesTarget = currentGraphAlgorithm?.usesTarget ?? false
+  const adjacencyActive = graphMode === 'adjacency' && (currentGraphAlgorithm?.acceptsAdjacencyList ?? false)
+  const graphParse = useMemo(() => {
+    if (adjacencyActive) return parseAdjacencyText(customAdjacencyText)
+    return customGraphText !== null ? parseGraphText(customGraphText, { allowNegativeWeights }) : null
+  }, [adjacencyActive, customAdjacencyText, customGraphText, allowNegativeWeights])
   const effectiveGraph = graphParse?.graph ?? DEMO_GRAPH
   const effectiveStart = useMemo(() => {
     if (customStartNode && effectiveGraph.nodes.some((n) => n.id === customStartNode)) return customStartNode
     return effectiveGraph.nodes[0]?.id ?? DEMO_START
   }, [customStartNode, effectiveGraph])
+  // Default end node: the last node that isn't the start, so the default
+  // run actually has somewhere to go.
+  const effectiveGraphTarget = useMemo(() => {
+    if (customGraphTarget && effectiveGraph.nodes.some((n) => n.id === customGraphTarget)) return customGraphTarget
+    const others = effectiveGraph.nodes.filter((n) => n.id !== effectiveStart)
+    return (others[others.length - 1] ?? effectiveGraph.nodes[0])?.id ?? effectiveStart
+  }, [customGraphTarget, effectiveGraph, effectiveStart])
 
   const graph = useAlgorithmKind(
     algorithmId,
     GRAPH_ALGORITHMS,
-    (a) => recordGraphFrames(() => a.run(effectiveGraph, effectiveStart)),
-    (ctx, w, h, frame) => renderGraphFrame(ctx, w, h, frame, effectiveGraph),
-    [effectiveGraph, effectiveStart],
+    (a) => recordGraphFrames(() => a.run(effectiveGraph, effectiveStart, effectiveGraphTarget)),
+    (ctx, w, h, frame) =>
+      renderGraphFrame(
+        ctx,
+        w,
+        h,
+        frame,
+        effectiveGraph,
+        usesTarget ? { start: effectiveStart, target: effectiveGraphTarget } : {},
+      ),
+    [effectiveGraph, effectiveStart, effectiveGraphTarget, usesTarget],
   )
+
+  // The graph currently on screen for the *edge-list* format, used to carry
+  // weights across a round trip through the (unweighted) adjacency view.
+  const edgeListGraph = useMemo(
+    () => parseGraphText(customGraphText ?? DEFAULT_GRAPH_TEXT, { allowNegativeWeights: true }).graph,
+    [customGraphText],
+  )
+
+  const handleGraphModeChange = (next: GraphInputMode) => {
+    if (next === graphMode) return
+    if (next === 'adjacency') {
+      setCustomAdjacencyText(graphToAdjacencyText(effectiveGraph))
+    } else {
+      const fromAdjacency = parseAdjacencyText(customAdjacencyText).graph
+      if (fromAdjacency) setCustomGraphText(graphToText(mergeWeights(fromAdjacency, edgeListGraph)))
+    }
+    setGraphMode(next)
+  }
+
+  // Weighted algorithms can't read an adjacency list, so leaving the
+  // unweighted ones converts it back to edges first.
+  const handleAlgorithmChange = (id: string) => {
+    const next = GRAPH_ALGORITHMS.find((a) => a.id === id)
+    if (graphMode === 'adjacency' && !next?.acceptsAdjacencyList) handleGraphModeChange('edges')
+    setAlgorithmId(id)
+  }
   const tree = useAlgorithmKind(
     algorithmId,
     TREE_ALGORITHMS,
@@ -285,7 +336,7 @@ function App() {
       <AppHeader
         algorithms={ALL_ALGORITHMS}
         selectedId={algorithmId}
-        onChange={setAlgorithmId}
+        onChange={handleAlgorithmChange}
         themeState={themeState}
         onThemePresetChange={handleThemePresetChange}
         onThemeColorOverride={handleThemeColorOverride}
@@ -320,8 +371,14 @@ function App() {
       )}
       {GRAPH_IDS.has(algorithmId) && (
         <GraphInput
-          value={customGraphText ?? DEFAULT_GRAPH_TEXT}
-          onChange={setCustomGraphText}
+          value={adjacencyActive ? customAdjacencyText : (customGraphText ?? DEFAULT_GRAPH_TEXT)}
+          onChange={adjacencyActive ? setCustomAdjacencyText : setCustomGraphText}
+          mode={adjacencyActive ? 'adjacency' : 'edges'}
+          onModeChange={handleGraphModeChange}
+          allowAdjacency={currentGraphAlgorithm?.acceptsAdjacencyList ?? false}
+          showEndNode={usesTarget}
+          endNode={effectiveGraphTarget}
+          onEndNodeChange={setCustomGraphTarget}
           error={graphParse?.error}
           startNode={effectiveStart}
           onStartNodeChange={setCustomStartNode}
@@ -382,6 +439,18 @@ function App() {
           render={graph.render}
           explainer={explainGraphStep}
           algorithmId={algorithmId}
+          extraPanel={
+            usesTarget
+              ? (frame) => (
+                  <ShortestPathPanel
+                    frame={frame}
+                    algorithmId={algorithmId}
+                    start={effectiveStart}
+                    target={effectiveGraphTarget}
+                  />
+                )
+              : undefined
+          }
         />
       )}
       {tree && (
